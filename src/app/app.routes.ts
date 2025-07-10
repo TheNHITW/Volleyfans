@@ -4,6 +4,7 @@ import { RegistrationForm } from './registration-form/registration-form';
 import { Admin } from './admin/admin';
 import { AuthGuard } from './auth.guard';
 import { LoginComponent } from './login';
+import { FormsModule } from '@angular/forms';
 
 export const routes: Routes = [
   { path: '', component: Home },

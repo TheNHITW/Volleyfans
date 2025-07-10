@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
+
 import { Home } from './home/home';
 import { RegistrationForm } from './registration-form/registration-form';
 import { Admin } from './admin/admin';
