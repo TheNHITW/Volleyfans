@@ -1,0 +1,45 @@
+<main class="register-page">
+  <div class="register-container">
+    <img class="register-logo" src="logo.png" alt="Logo Torneo">
+
+    <h1>Iscrivi la tua squadra</h1>
+
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nome squadra</mat-label>
+        <input matInput formControlName="teamName" placeholder="Nome squadra">
+      </mat-form-field>
+
+      <h2 class="players-title">Giocatori</h2>
+
+      <div formArrayName="players">
+        <div *ngFor="let player of players.controls; let i = index" [formGroupName]="i" class="player-block">
+          <h3>Giocatore {{ i + 1 }}</h3>
+
+          <mat-form-field appearance="fill" class="full-width compact">
+            <mat-label>es. Mario Rossi</mat-label>
+            <input matInput formControlName="name" placeholder="Nome">
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width compact">
+            <mat-label>Sesso</mat-label>
+            <mat-select formControlName="gender">
+              <mat-option value="">Seleziona</mat-option>
+              <mat-option value="M">Maschio</mat-option>
+              <mat-option value="F">Femmina</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Recapito telefonico</mat-label>
+            <input matInput formControlName="phone" placeholder="Telefono">
+        </mat-form-field>
+
+      <button mat-raised-button type="submit" [disabled]="registrationForm.invalid">
+        Invia iscrizione
+      </button>
+    </form>
+  </div>
+</main>

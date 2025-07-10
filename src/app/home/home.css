@@ -1,0 +1,42 @@
+.hero {
+  height: calc(100vh - 64px); /* meno altezza navbar */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+      rgb(255, 81, 0), 
+      rgba(0,0,0,0.5)
+    ),
+    url('https://source.unsplash.com/1600x900/?beach,volleyball') center/cover no-repeat;
+  text-align: center;
+  color: rgb(4, 4, 66);
+  padding: 0 20px;
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin: 0 0 20px 0;
+}
+
+.hero p {
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.hero button {
+  background-color: #ff6600;
+  color: white;
+}
+
+  .hero-logo {
+    max-width: 150px;
+  }
+
+  .hero-logo {
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  margin-top: -9%;
+}

@@ -1,1 +1,36 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body {   
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+:root {
+  --primary: #ff5100;
+  --accent: #ff6600;
+  --dark: #1a1f42;
+}
+
+mat-toolbar {
+  background-color: var(--primary) !important;
+  color: white;
+}
+
+main.content {
+  flex: 1 0 auto; /* fa espandere il main */
+}
+
+.footer {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 20px;
+  background: var(--dark);
+  color: white;
+}
+
+
+

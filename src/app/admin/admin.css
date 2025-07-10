@@ -1,0 +1,44 @@
+h1 {
+  text-align: center;
+  color: #1a1f42;
+  margin-bottom: 20px;
+}
+
+button {
+  margin: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #ff6600;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+p {
+  text-align: center;
+  margin-top: 40px;
+  color: #1a1f42;
+  font-weight: bold;
+}

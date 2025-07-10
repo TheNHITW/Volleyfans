@@ -1,0 +1,37 @@
+<h1>Area Admin</h1>
+
+<button mat-raised-button color="accent" (click)="exportToCSV()">Esporta CSV</button>
+<button mat-raised-button color="warn" (click)="clearAll()">Cancella Tutto</button>
+
+<table *ngIf="teams.length > 0">
+  <thead>
+    <tr>
+        <th>Nome Squadra</th>
+        <th>Telefono</th>
+        <th>Giocatore 1</th>
+        <th>G1 Sesso</th>
+        <th>Giocatore 2</th>
+        <th>G2 Sesso</th>
+        <th>Giocatore 3</th>
+        <th>G3 Sesso</th>
+        <th>Giocatore 4</th>
+        <th>G4 Sesso</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let team of teams">
+        <td>{{ team.teamName }}</td>
+        <td>{{ team.phone }}</td>
+        <td>{{ team.players[0].name }}</td>
+        <td>{{ team.players[0].gender }}</td>
+        <td>{{ team.players[1].name }}</td>
+        <td>{{ team.players[1].gender }}</td>
+        <td>{{ team.players[2].name }}</td>
+        <td>{{ team.players[2].gender }}</td>
+        <td>{{ team.players[3].name }}</td>
+        <td>{{ team.players[3].gender }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="teams.length === 0">Nessuna squadra iscritta.</p>
