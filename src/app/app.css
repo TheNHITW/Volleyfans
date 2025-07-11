@@ -1,57 +1,67 @@
+/* ==== BASE ==== */
 html, body {
   height: 100%;
   margin: 0;
   display: flex;
   flex-direction: column;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  overflow-x: hidden;
 }
 
+/* ==== NAVBAR ==== */
 .custom-toolbar {
+  position: fixed;   /* fissa */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: #1a1f42;
+  color: white;
   display: flex;
   justify-content: center;
-  background: var(--primary, #ff6600);
-  color: white;
-  padding: 0 20px;
+  align-items: center;
+  z-index: 1000;
 }
 
 .nav-center {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 30px; /* più spazio default */
+  flex-wrap: wrap; /* se manca spazio va a capo, ma link restano in fila */
 }
 
 .nav-center a {
-  color: #1a1f42;
+  color: #ffffff;
   text-decoration: none;
   font-weight: bold;
   font-size: 16px;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 4px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .nav-center a:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-center a.active-link {
-  background: #1a1f42;           
-  color: #ff6600;                
-  border: 2px solid #ff6600;     
-  border-radius: 20px;           
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
+  background: #ff6600;
+  border-radius: 20px;
+  color: #ffffff;
 }
 
+/* ==== HERO ==== */
 .hero {
   flex: 1 0 auto;
-  min-height: calc(100vh - 64px - 80px); /* altezza schermo - navbar - footer */
+  padding-top: 80px; /* uguale o leggermente + della navbar */
+  min-height: calc(100vh - 64px - 80px);
   background: linear-gradient(to bottom, #ff6600, #c75a2c);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 40px 20px;
+  padding-bottom: 40px;
 }
 
 .hero-logo {
@@ -75,6 +85,7 @@ html, body {
   margin: 0;
 }
 
+/* ==== FOOTER ==== */
 .footer {
   flex-shrink: 0;
   text-align: center;
@@ -83,10 +94,17 @@ html, body {
   color: white;
 }
 
+/* ==== RESPONSIVE ==== */
 @media (max-width: 768px) {
   .nav-center {
-    flex-direction: column;
-    gap: 10px;
+    gap: 10px;  /* meno gap se schermo stretto */
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-center a {
+    font-size: 14px; /* testo più piccolo se serve */
+    padding: 6px 8px;
   }
 
   .hero-title {
@@ -99,5 +117,28 @@ html, body {
 
   .hero-logo {
     max-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-center {
+    gap: 8px;
+  }
+
+  .nav-center a {
+    font-size: 13px;
+    padding: 4px 6px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-date {
+    font-size: 16px;
+  }
+
+  .hero-logo {
+    max-width: 120px;
   }
 }

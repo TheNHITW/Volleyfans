@@ -1,26 +1,31 @@
+/* ==== PAGINA REGISTRAZIONE ==== */
 .register-page {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 64px - 80px);
+  min-height: calc(100vh - 80px); /* altezza schermo meno navbar */
+  padding-top: 80px; /* uguale all’altezza navbar */
   text-align: center;
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 
   background: linear-gradient(
       rgb(255, 81, 0),
       rgba(0, 0, 0, 0.5)
     ),
     url('https://source.unsplash.com/1600x900/?beach,volleyball') center/cover no-repeat;
-  color: rgb(4, 4, 66);
+  color: #040442;
+  box-sizing: border-box;
 }
 
 .register-container {
   max-width: 600px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   padding: 20px;
   border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .register-logo {
@@ -65,9 +70,15 @@ h1 {
   padding-bottom: 0 !important;
 }
 
+/* ==== BUTTON ==== */
 button {
   background-color: #ff6600;
   color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 button[disabled] {
@@ -85,4 +96,66 @@ button:hover:enabled {
   padding: 20px;
   background: #1a1f42;
   color: white;
+}
+
+/* ==== MEDIA QUERY 768px ==== */
+@media (max-width: 768px) {
+  .register-page {
+    padding-top: 90px; /* un filo in più su mobile */
+  }
+
+  .register-container {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .players-title {
+    font-size: 18px;
+  }
+
+  .player-block {
+    padding: 12px;
+  }
+
+  .player-block h3 {
+    font-size: 15px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+/* ==== MEDIA QUERY 480px ==== */
+@media (max-width: 480px) {
+  .register-page {
+    padding-top: 100px;
+  }
+
+  .register-container {
+    max-width: 95%;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .players-title {
+    font-size: 16px;
+  }
+
+  .player-block h3 {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
 }
