@@ -1,35 +1,38 @@
 <h1>Area Admin</h1>
 
-<button mat-raised-button color="accent" (click)="exportToCSV()">Esporta CSV</button>
-<button mat-raised-button color="warn" (click)="clearAll()">Cancella Tutto</button>
+<div class="admin-buttons">
+  <button mat-raised-button color="accent" (click)="exportToCSV()">
+    Esporta CSV
+  </button>
+</div>
 
-<table *ngIf="teams.length > 0">
+<table *ngIf="teams.length > 0" class="admin-table">
   <thead>
     <tr>
-        <th>Nome Squadra</th>
-        <th>Telefono</th>
-        <th>Giocatore 1</th>
-        <th>G1 Sesso</th>
-        <th>Giocatore 2</th>
-        <th>G2 Sesso</th>
-        <th>Giocatore 3</th>
-        <th>G3 Sesso</th>
-        <th>Giocatore 4</th>
-        <th>G4 Sesso</th>
+      <th>Nome Squadra</th>
+      <th>Telefono</th>
+      <th>Giocatore 1</th>
+      <th>Sesso 1</th>
+      <th>Giocatore 2</th>
+      <th>Sesso 2</th>
+      <th>Giocatore 3</th>
+      <th>Sesso 3</th>
+      <th>Giocatore 4</th>
+      <th>Sesso 4</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let team of teams">
-        <td>{{ team.teamName }}</td>
-        <td>{{ team.phone }}</td>
-        <td>{{ team.players[0].name }}</td>
-        <td>{{ team.players[0].gender }}</td>
-        <td>{{ team.players[1].name }}</td>
-        <td>{{ team.players[1].gender }}</td>
-        <td>{{ team.players[2].name }}</td>
-        <td>{{ team.players[2].gender }}</td>
-        <td>{{ team.players[3].name }}</td>
-        <td>{{ team.players[3].gender }}</td>
+      <td>{{ team.teamName }}</td>
+      <td>{{ team.phone }}</td>
+      <td>{{ team.players[0].name }}</td>
+      <td>{{ team.players[0].gender }}</td>
+      <td>{{ team.players[1].name }}</td>
+      <td>{{ team.players[1].gender }}</td>
+      <td>{{ team.players[2].name }}</td>
+      <td>{{ team.players[2].gender }}</td>
+      <td>{{ team.players[3].name }}</td>
+      <td>{{ team.players[3].gender }}</td>
     </tr>
   </tbody>
 </table>

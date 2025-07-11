@@ -1,0 +1,24 @@
+[
+  {
+    "teamName": "asaras",
+    "phone": "3319048630",
+    "players": [
+      {
+        "name": "asdasdas",
+        "gender": "M"
+      },
+      {
+        "name": "asdasfafs",
+        "gender": "M"
+      },
+      {
+        "name": "asdasdasd",
+        "gender": "F"
+      },
+      {
+        "name": "sdasdasd",
+        "gender": "F"
+      }
+    ]
+  }
+]

@@ -14,7 +14,10 @@
 
       <div formArrayName="players">
         <div *ngFor="let player of players.controls; let i = index" [formGroupName]="i" class="player-block">
-          <h3>Giocatore {{ i + 1 }}</h3>
+          <h3>
+            Giocatore {{ i + 1 }} 
+            <span *ngIf="i === 0">(CAPITANO)</span>
+          </h3>
 
           <mat-form-field appearance="fill" class="full-width compact">
             <mat-label>es. Mario Rossi</mat-label>
@@ -32,10 +35,10 @@
         </div>
       </div>
 
-        <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Recapito telefonico</mat-label>
-            <input matInput formControlName="phone" placeholder="Telefono">
-        </mat-form-field>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Recapito Telefonico Capitano</mat-label>
+        <input matInput formControlName="phone" placeholder="Telefono">
+      </mat-form-field>
 
       <button mat-raised-button type="submit" [disabled]="registrationForm.invalid">
         Invia iscrizione

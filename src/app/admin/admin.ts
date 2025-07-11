@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 interface Player {
   name: string;
@@ -13,18 +14,31 @@ interface Team {
 
 @Component({
   selector: 'app-admin',
-  standalone: false,
   templateUrl: './admin.html',
+  standalone: false,
   styleUrls: ['./admin.css']
 })
 export class Admin implements OnInit {
 
   teams: Team[] = [];
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.teams = JSON.parse(localStorage.getItem('teams') || '[]');
+    this.loadTeams();
+  }
+
+  loadTeams() {
+    this.http.get<Team[]>('http://localhost:3000/admin/registrations')
+      .subscribe({
+        next: (res) => {
+          this.teams = res;
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento:', err);
+          alert('Errore nel recuperare le iscrizioni.');
+        }
+      });
   }
 
   exportToCSV() {
@@ -33,13 +47,13 @@ export class Admin implements OnInit {
       return;
     }
 
-    let csvContent = 'Nome Squadra,Telefono, Giocatore 1, Sesso 1, Giocatore 2, Sesso 2, Giocatore 3, Sesso 3, Giocatore 4, Sesso 4\n';
+    let csvContent = 'Nome Squadra,Telefono,Giocatore 1,Sesso 1,Giocatore 2,Sesso 2,Giocatore 3,Sesso 3,Giocatore 4,Sesso 4\n';
 
     this.teams.forEach((team: Team) => {
       const players = team.players
         .map((p: Player) => `${p.name},${p.gender}`)
         .join(',');
-      csvContent += `${team.teamName},${players}\n`;
+      csvContent += `${team.teamName},${team.phone},${players}\n`;
     });
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -52,11 +66,4 @@ export class Admin implements OnInit {
     link.click();
     document.body.removeChild(link);
   }
-
-  clearAll() {
-    localStorage.removeItem('teams');
-    this.teams = [];
-    alert('Tutte le iscrizioni sono state cancellate.');
-  }
-
 }
