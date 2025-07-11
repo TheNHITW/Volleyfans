@@ -8,7 +8,7 @@ export class AuthService {
 
   login(username: string, password: string): boolean {
     // ✅ Qui fai il controllo finto (o da DB/API)
-    if (username === 'admin' && password === 'password123') {
+    if (username === 'admin' && password === 'lollogay123.') {
       this.loggedIn = true;
       localStorage.setItem('isLoggedIn', 'true');
       return true;
