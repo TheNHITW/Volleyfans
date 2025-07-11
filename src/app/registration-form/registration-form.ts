@@ -72,7 +72,7 @@ export class RegistrationForm {
     }
 
     // 2️⃣ Tutto OK → Invia al backend
-    this.http.post('https://volleyfans-jo89.onrender.com/register', formData)
+    this.http.post('https://volleyfans-bh.onrender.com/register', formData)
       .subscribe({
         next: (res) => {
           alert('Iscrizione inviata! Squadra registrata.');

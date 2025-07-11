@@ -29,7 +29,7 @@ export class Admin implements OnInit {
   }
 
   loadTeams() {
-    this.http.get<Team[]>('https://volleyfans-jo89.onrender.com/admin/registrations')
+    this.http.get<Team[]>('https://volleyfans-bh.onrender.com/admin/registrations')
       .subscribe({
         next: (res) => {
           this.teams = res;
