@@ -1,1 +1,200 @@
-[]
+[
+  {
+    "teamName": "Faccio bokkini",
+    "phone": "3273865040",
+    "players": [
+      {
+        "name": "Lollo",
+        "gender": "M"
+      },
+      {
+        "name": "Asia",
+        "gender": "F"
+      },
+      {
+        "name": "Lele",
+        "gender": "M"
+      },
+      {
+        "name": "Giulia",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "La squadra che gioca",
+    "phone": "3294435280",
+    "players": [
+      {
+        "name": "Tamara Todisco",
+        "gender": "F"
+      },
+      {
+        "name": "Edoardo Angelini",
+        "gender": "M"
+      },
+      {
+        "name": "Mattia Di Panfilo",
+        "gender": "M"
+      },
+      {
+        "name": "Giulia Russo",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Mai gli stessi",
+    "phone": "3897955837",
+    "players": [
+      {
+        "name": "Chiara Di caterino",
+        "gender": "F"
+      },
+      {
+        "name": "Alessia costabile",
+        "gender": "F"
+      },
+      {
+        "name": "Giulio giura",
+        "gender": "M"
+      },
+      {
+        "name": "Davide d’aloise",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "Pomodori secchi",
+    "phone": "3480187717",
+    "players": [
+      {
+        "name": "Jacopo Rosati",
+        "gender": "M"
+      },
+      {
+        "name": "Mirko Frascella",
+        "gender": "M"
+      },
+      {
+        "name": "Blanca Rodriguez",
+        "gender": "F"
+      },
+      {
+        "name": "Valentina Priori",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Volley e trans",
+    "phone": "3404976260",
+    "players": [
+      {
+        "name": "Federico Riccardi",
+        "gender": "M"
+      },
+      {
+        "name": "Giovanni Palumbo",
+        "gender": "M"
+      },
+      {
+        "name": "Eleonora Angelica",
+        "gender": "F"
+      },
+      {
+        "name": "Valeria Scovacricchi",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Fettine Panate",
+    "phone": "3458096905",
+    "players": [
+      {
+        "name": "Davide Marrazzi",
+        "gender": "M"
+      },
+      {
+        "name": "Marco Marrone",
+        "gender": "M"
+      },
+      {
+        "name": "Alessia Marrone",
+        "gender": "F"
+      },
+      {
+        "name": "Claudia Adamo",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Gli improvvisati",
+    "phone": "3293360122",
+    "players": [
+      {
+        "name": "Antonino Tarantino",
+        "gender": "M"
+      },
+      {
+        "name": "Simone Vitto",
+        "gender": "M"
+      },
+      {
+        "name": "Angela Marzolo",
+        "gender": "F"
+      },
+      {
+        "name": "Lucia chiaramente",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Team wifi",
+    "phone": "3454848057",
+    "players": [
+      {
+        "name": "Giovanni Guglielmelli",
+        "gender": "M"
+      },
+      {
+        "name": "Enrico Casini",
+        "gender": "M"
+      },
+      {
+        "name": "Francesca Picco",
+        "gender": "F"
+      },
+      {
+        "name": "Alessia Garozzo",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Volley vincele",
+    "phone": "3348293020",
+    "players": [
+      {
+        "name": "Tommaso Tiberi",
+        "gender": "M"
+      },
+      {
+        "name": "Flaminia Romano",
+        "gender": "F"
+      },
+      {
+        "name": "Cristina Durante",
+        "gender": "F"
+      },
+      {
+        "name": "Roberto Durante",
+        "gender": "M"
+      }
+    ]
+  }
+]

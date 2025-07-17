@@ -6,7 +6,7 @@
   </button>
 </div>
 
-<table *ngIf="teams.length > 0" class="admin-table">
+<table *ngIf="teams.length > 0" class="admin-table" mat-table>
   <thead>
     <tr>
       <th>Nome Squadra</th>
@@ -19,6 +19,7 @@
       <th>Sesso 3</th>
       <th>Giocatore 4</th>
       <th>Sesso 4</th>
+      <th>Azioni</th>
     </tr>
   </thead>
   <tbody>
@@ -33,6 +34,11 @@
       <td>{{ team.players[2].gender }}</td>
       <td>{{ team.players[3].name }}</td>
       <td>{{ team.players[3].gender }}</td>
+      <td>
+        <button mat-button color="warn" (click)="deleteTeam(team.teamName)">
+          Cancella
+        </button>
+      </td>
     </tr>
   </tbody>
 </table>

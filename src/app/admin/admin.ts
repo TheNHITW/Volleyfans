@@ -14,12 +14,11 @@ interface Team {
 
 @Component({
   selector: 'app-admin',
-  templateUrl: './admin.html',
   standalone: false,
+  templateUrl: './admin.html',
   styleUrls: ['./admin.css']
 })
 export class Admin implements OnInit {
-
   teams: Team[] = [];
 
   constructor(private http: HttpClient) {}
@@ -31,9 +30,7 @@ export class Admin implements OnInit {
   loadTeams() {
     this.http.get<Team[]>('https://volleyfans-bh.onrender.com/admin/registrations')
       .subscribe({
-        next: (res) => {
-          this.teams = res;
-        },
+        next: (data) => this.teams = data,
         error: (err) => {
           console.error('Errore nel caricamento:', err);
           alert('Errore nel recuperare le iscrizioni.');
@@ -50,9 +47,7 @@ export class Admin implements OnInit {
     let csvContent = 'Nome Squadra,Telefono,Giocatore 1,Sesso 1,Giocatore 2,Sesso 2,Giocatore 3,Sesso 3,Giocatore 4,Sesso 4\n';
 
     this.teams.forEach((team: Team) => {
-      const players = team.players
-        .map((p: Player) => `${p.name},${p.gender}`)
-        .join(',');
+      const players = team.players.map(p => `${p.name},${p.gender}`).join(',');
       csvContent += `${team.teamName},${team.phone},${players}\n`;
     });
 
@@ -61,9 +56,23 @@ export class Admin implements OnInit {
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     link.setAttribute('download', 'iscrizioni_torneo.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+  }
+
+  deleteTeam(teamNameToDelete: string) {
+    const conferma = confirm(`Vuoi davvero eliminare la squadra "${teamNameToDelete}"?`);
+    if (!conferma) return;
+
+    this.http.delete(`https://volleyfans-bh.onrender.com/admin/registrations/${encodeURIComponent(teamNameToDelete)}`)
+      .subscribe({
+        next: () => {
+          this.teams = this.teams.filter(team => team.teamName !== teamNameToDelete);
+          alert('Squadra eliminata con successo.');
+        },
+        error: (err) => {
+          console.error('Errore durante l\'eliminazione:', err);
+          alert('Errore durante l\'eliminazione della squadra.');
+        }
+      });
   }
 }
