@@ -39,6 +39,10 @@
         <mat-label>Recapito Telefonico Capitano</mat-label>
         <input matInput formControlName="phone" placeholder="Telefono">
       </mat-form-field>
+      
+      <mat-checkbox formControlName="privacyConsent" class="privacy-check">
+        Dichiaro di aver letto e accettato <a href="/privacy" target="_blank">l'informativa sulla privacy</a>.
+      </mat-checkbox>
 
       <button mat-raised-button type="submit" [disabled]="registrationForm.invalid">
         Invia iscrizione

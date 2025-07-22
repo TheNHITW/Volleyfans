@@ -25,7 +25,8 @@ export class RegistrationForm {
         this.createPlayer(),
         this.createPlayer(),
         this.createPlayer()
-      ])
+      ]),
+      privacyConsent: [false, Validators.requiredTrue]
     });
   }
 
