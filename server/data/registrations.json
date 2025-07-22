@@ -1,27 +1,5 @@
 [
   {
-    "teamName": "Faccio bokkini",
-    "phone": "3273865040",
-    "players": [
-      {
-        "name": "Lollo",
-        "gender": "M"
-      },
-      {
-        "name": "Asia",
-        "gender": "F"
-      },
-      {
-        "name": "Lele",
-        "gender": "M"
-      },
-      {
-        "name": "Giulia",
-        "gender": "F"
-      }
-    ]
-  },
-  {
     "teamName": "La squadra che gioca",
     "phone": "3294435280",
     "players": [
@@ -193,6 +171,94 @@
       },
       {
         "name": "Roberto Durante",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "Se me la dai te l'appoggio",
+    "phone": "3929403959",
+    "players": [
+      {
+        "name": "Davide De Dominicis",
+        "gender": "M"
+      },
+      {
+        "name": "Alessandro Cittadini",
+        "gender": "M"
+      },
+      {
+        "name": "Sofia Falanga",
+        "gender": "F"
+      },
+      {
+        "name": "Chiara Piperno",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "I Prescritti",
+    "phone": "3333216203",
+    "players": [
+      {
+        "name": "Riccardo Camilli",
+        "gender": "M"
+      },
+      {
+        "name": "Valeria Avincola",
+        "gender": "F"
+      },
+      {
+        "name": "Giuseppe Gravino",
+        "gender": "M"
+      },
+      {
+        "name": "Giulia De Togni",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "I sangriosi",
+    "phone": "3332024005",
+    "players": [
+      {
+        "name": "Denise Angelini",
+        "gender": "F"
+      },
+      {
+        "name": "Erik Hrustic",
+        "gender": "M"
+      },
+      {
+        "name": "Giuliano Di Bartolomeo",
+        "gender": "M"
+      },
+      {
+        "name": "Alexa Tamburrini",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Würstel e patatine",
+    "phone": "3493721772",
+    "players": [
+      {
+        "name": "Chiara Piperno",
+        "gender": "F"
+      },
+      {
+        "name": "Luca Lanzavecchia",
+        "gender": "M"
+      },
+      {
+        "name": "Francesca Leone",
+        "gender": "F"
+      },
+      {
+        "name": "Alessandro Prata",
         "gender": "M"
       }
     ]
