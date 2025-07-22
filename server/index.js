@@ -58,10 +58,6 @@ app.delete('/admin/registrations/:teamName', (req, res) => {
   res.json({ success: true, message: `Squadra eliminata.` });
 });
 
-// ✅ Fallback Angular: restituisce index.html per tutte le route non API
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/volleyfans/browser/index.html'));
-});
 
 // ✅ Avvio server
 app.listen(PORT, () => {
