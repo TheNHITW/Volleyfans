@@ -20,15 +20,23 @@ interface Team {
 })
 export class Admin implements OnInit {
   teams: Team[] = [];
+  isRegistrationOpen = false;
+  readonly baseUrl = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://volleyfans-bh.onrender.com';
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.loadTeams();
+    this.http.get<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/config`)
+      .subscribe(res => {
+        this.isRegistrationOpen = res.isRegistrationOpen;
+      });
   }
 
   loadTeams() {
-    this.http.get<Team[]>('https://volleyfans-bh.onrender.com/admin/registrations')
+    this.http.get<Team[]>(`${this.baseUrl}/admin/registrations`)
       .subscribe({
         next: (data) => this.teams = data,
         error: (err) => {
@@ -59,11 +67,18 @@ export class Admin implements OnInit {
     link.click();
   }
 
+  toggleRegistration() {
+    this.http.post<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/admin/toggle-registration`, {})
+      .subscribe(res => {
+        this.isRegistrationOpen = res.isRegistrationOpen;
+      });
+  }
+
   deleteTeam(teamNameToDelete: string) {
     const conferma = confirm(`Vuoi davvero eliminare la squadra "${teamNameToDelete}"?`);
     if (!conferma) return;
 
-    this.http.delete(`https://volleyfans-bh.onrender.com/admin/registrations/${encodeURIComponent(teamNameToDelete)}`)
+    this.http.delete(`${this.baseUrl}/admin/registrations/${encodeURIComponent(teamNameToDelete)}`)
       .subscribe({
         next: () => {
           this.teams = this.teams.filter(team => team.teamName !== teamNameToDelete);

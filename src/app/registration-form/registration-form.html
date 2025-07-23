@@ -1,10 +1,9 @@
-<main class="register-page">
+<main class="register-page" [class.disabled]="!registrationOpen">
   <div class="register-container">
     <img class="register-logo" src="logo.png" alt="Logo Torneo">
 
     <h1>Iscrivi la tua squadra</h1>
-
-    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <form *ngIf="registrationOpen; else closedMessage" [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Nome squadra</mat-label>
         <input matInput formControlName="teamName" placeholder="Nome squadra">
@@ -41,12 +40,15 @@
       </mat-form-field>
       
       <mat-checkbox formControlName="privacyConsent" class="privacy-check">
-        Dichiaro di aver letto e accettato <a href="/privacy" target="_blank">l'informativa sulla privacy</a>.
+        Dichiaro di aver letto e accettato l'informativa sulla privacy.
       </mat-checkbox>
 
       <button mat-raised-button type="submit" [disabled]="registrationForm.invalid">
         Invia iscrizione
       </button>
     </form>
-  </div>
+    </div>
+  <ng-template #closedMessage>
+  <p class="closed-msg">Le iscrizioni sono attualmente chiuse.</p>
+  </ng-template>
 </main>

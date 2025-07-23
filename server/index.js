@@ -58,6 +58,35 @@ app.delete('/admin/registrations/:teamName', (req, res) => {
   res.json({ success: true, message: `Squadra eliminata.` });
 });
 
+const configFile = path.join(__dirname, 'data', 'config.json');
+
+function getConfig() {
+  const configRaw = fs.readFileSync(configFile, 'utf8');
+  return JSON.parse(configRaw);
+}
+
+function setConfig(newConfig) {
+  fs.writeFileSync(configFile, JSON.stringify(newConfig, null, 2));
+}
+
+app.get('/config', (req, res) => {
+  res.json(getConfig());
+});
+
+app.post('/config/registration', (req, res) => {
+  const { isRegistrationOpen } = req.body;
+  const current = getConfig();
+  current.isRegistrationOpen = isRegistrationOpen;
+  setConfig(current);
+  res.json({ success: true });
+});
+
+app.post('/admin/toggle-registration', (req, res) => {
+  const config = getConfig();
+  config.isRegistrationOpen = !config.isRegistrationOpen;
+  setConfig(config);
+  res.json({ success: true, isRegistrationOpen: config.isRegistrationOpen });
+});
 
 // ✅ Avvio server
 app.listen(PORT, () => {

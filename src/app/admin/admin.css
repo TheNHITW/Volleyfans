@@ -109,6 +109,20 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
+.admin-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.btn-open {
+  background-color: #4caf50; /* verde */
+  color: white;
+}
+.btn-closed {
+  background-color: #f44336; /* rosso */
+  color: white;
+}
 
 button:hover {
   background: #e25500;

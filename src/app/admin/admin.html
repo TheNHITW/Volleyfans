@@ -4,7 +4,13 @@
   <button mat-raised-button color="accent" (click)="exportToCSV()">
     Esporta CSV
   </button>
+  <button mat-raised-button
+          [ngClass]="isRegistrationOpen ? 'btn-open' : 'btn-closed'"
+          (click)="toggleRegistration()">
+    {{ isRegistrationOpen ? 'Iscrizioni Aperte' : 'Iscrizioni Chiuse' }}
+  </button>
 </div>
+
 
 <table *ngIf="teams.length > 0" class="admin-table" mat-table>
   <thead>
