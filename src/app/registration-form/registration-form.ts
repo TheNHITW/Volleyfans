@@ -29,6 +29,7 @@ export class RegistrationForm implements OnInit {
         this.createPlayer(),
         this.createPlayer()
       ]),
+      selectedDates: [[], Validators.required],
       privacyConsent: [false, Validators.requiredTrue]
     });
   }
@@ -84,7 +85,8 @@ export class RegistrationForm implements OnInit {
       return;
     }
 
-    this.http.get<any[]>('${this.baseUrl}/registrations').subscribe({
+    this.http.get<any[]>(`${this.baseUrl}/admin/registrations?date=${formData.selectedDates[0]}`)
+      .subscribe({
       next: (registrations) => {
         const teamNameTaken = registrations.some(t => t.teamName.trim().toLowerCase() === teamName);
         if (teamNameTaken) {
@@ -101,7 +103,7 @@ export class RegistrationForm implements OnInit {
           return;
         }
 
-        this.http.post('${this.baseUrl}/register', formData)
+        this.http.post(`${this.baseUrl}/register`, formData)
           .subscribe({
             next: () => {
               alert('Iscrizione inviata! Squadra registrata.');

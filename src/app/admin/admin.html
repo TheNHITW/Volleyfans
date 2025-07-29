@@ -1,9 +1,21 @@
 <h1>Area Admin</h1>
 
-<div class="admin-buttons">
+<!-- 🔘 Selezione della data -->
+<mat-form-field appearance="fill" class="full-width" style="max-width: 300px; margin-bottom: 1rem;">
+  <mat-label>Seleziona una data</mat-label>
+  <mat-select [(value)]="selectedDate" (selectionChange)="onDateChange()">
+    <mat-option *ngFor="let date of availableDates" [value]="date.value">
+      {{ date.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<!-- 🔘 Pulsanti principali -->
+<div class="admin-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
   <button mat-raised-button color="accent" (click)="exportToCSV()">
     Esporta CSV
   </button>
+
   <button mat-raised-button
           [ngClass]="isRegistrationOpen ? 'btn-open' : 'btn-closed'"
           (click)="toggleRegistration()">
@@ -11,7 +23,7 @@
   </button>
 </div>
 
-
+<!-- 📋 Tabella squadre -->
 <table *ngIf="teams.length > 0" class="admin-table" mat-table>
   <thead>
     <tr>
@@ -49,4 +61,4 @@
   </tbody>
 </table>
 
-<p *ngIf="teams.length === 0">Nessuna squadra iscritta.</p>
+<p *ngIf="teams.length === 0">Nessuna squadra iscritta per la data selezionata.</p>

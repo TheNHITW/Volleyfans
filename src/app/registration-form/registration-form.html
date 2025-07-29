@@ -3,7 +3,16 @@
     <img class="register-logo" src="logo.png" alt="Logo Torneo">
 
     <h1>Iscrivi la tua squadra</h1>
+
       <form *ngIf="registrationOpen; else closedMessage" [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Seleziona le date a cui vuoi partecipare</mat-label>
+        <mat-select formControlName="selectedDates" multiple>
+        <mat-option value="2025-08-31">Domenica 31 Agosto 2025</mat-option>
+        <mat-option value="2025-09-12">Domenica 21 Settembre 2025</mat-option>
+        <mat-option value="2025-10-12">Domenica 12 Ottobre 2025</mat-option>
+      </mat-select>
+      </mat-form-field>
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Nome squadra</mat-label>
         <input matInput formControlName="teamName" placeholder="Nome squadra">

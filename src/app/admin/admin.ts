@@ -20,26 +20,43 @@ interface Team {
 })
 export class Admin implements OnInit {
   teams: Team[] = [];
+  selectedDate = '';
   isRegistrationOpen = false;
+
   readonly baseUrl = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
     : 'https://volleyfans-bh.onrender.com';
 
+  readonly availableDates = [
+    { label: '31 Agosto 2025', value: '2025-08-31' },
+    { label: '12 Settembre 2025', value: '2025-09-12' },
+    { label: '12 Ottobre 2025', value: '2025-10-12' }
+  ];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.loadTeams();
+    this.selectedDate = this.availableDates[0].value;
+    this.loadTeams(this.selectedDate);
+    this.getRegistrationStatus();
+  }
+
+  getRegistrationStatus() {
     this.http.get<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/config`)
-      .subscribe(res => {
-        this.isRegistrationOpen = res.isRegistrationOpen;
+      .subscribe({
+        next: res => this.isRegistrationOpen = res.isRegistrationOpen,
+        error: () => {
+          alert('Errore nel recuperare lo stato delle iscrizioni.');
+          this.isRegistrationOpen = false;
+        }
       });
   }
 
-  loadTeams() {
-    this.http.get<Team[]>(`${this.baseUrl}/admin/registrations`)
+  loadTeams(date: string) {
+    this.http.get<Team[]>(`${this.baseUrl}/admin/registrations?date=${date}`)
       .subscribe({
-        next: (data) => this.teams = data,
-        error: (err) => {
+        next: data => this.teams = data,
+        error: err => {
           console.error('Errore nel caricamento:', err);
           alert('Errore nel recuperare le iscrizioni.');
         }
@@ -48,46 +65,48 @@ export class Admin implements OnInit {
 
   exportToCSV() {
     if (this.teams.length === 0) {
-      alert('Nessuna iscrizione trovata.');
+      alert('Nessuna iscrizione trovata per questa data.');
       return;
     }
 
-    let csvContent = 'Nome Squadra,Telefono,Giocatore 1,Sesso 1,Giocatore 2,Sesso 2,Giocatore 3,Sesso 3,Giocatore 4,Sesso 4\n';
-
-    this.teams.forEach((team: Team) => {
+    const header = 'Nome Squadra,Telefono,Giocatore 1,Sesso 1,Giocatore 2,Sesso 2,Giocatore 3,Sesso 3,Giocatore 4,Sesso 4\n';
+    const rows = this.teams.map(team => {
       const players = team.players.map(p => `${p.name},${p.gender}`).join(',');
-      csvContent += `${team.teamName},${team.phone},${players}\n`;
-    });
+      return `${team.teamName},${team.phone},${players}`;
+    }).join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'iscrizioni_torneo.csv');
+    link.href = URL.createObjectURL(blob);
+    link.download = `iscrizioni_${this.selectedDate}.csv`;
     link.click();
   }
 
   toggleRegistration() {
     this.http.post<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/admin/toggle-registration`, {})
-      .subscribe(res => {
-        this.isRegistrationOpen = res.isRegistrationOpen;
+      .subscribe({
+        next: res => this.isRegistrationOpen = res.isRegistrationOpen,
+        error: () => alert('Errore nel cambiare lo stato delle iscrizioni.')
       });
   }
 
   deleteTeam(teamNameToDelete: string) {
-    const conferma = confirm(`Vuoi davvero eliminare la squadra "${teamNameToDelete}"?`);
-    if (!conferma) return;
+    if (!confirm(`Vuoi davvero eliminare la squadra "${teamNameToDelete}"?`)) return;
 
-    this.http.delete(`${this.baseUrl}/admin/registrations/${encodeURIComponent(teamNameToDelete)}`)
+    this.http.delete(`${this.baseUrl}/admin/registrations/${encodeURIComponent(teamNameToDelete)}?date=${this.selectedDate}`)
       .subscribe({
         next: () => {
           this.teams = this.teams.filter(team => team.teamName !== teamNameToDelete);
           alert('Squadra eliminata con successo.');
         },
-        error: (err) => {
+        error: err => {
           console.error('Errore durante l\'eliminazione:', err);
           alert('Errore durante l\'eliminazione della squadra.');
         }
       });
+  }
+
+  onDateChange() {
+    this.loadTeams(this.selectedDate);
   }
 }
