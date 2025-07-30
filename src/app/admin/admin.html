@@ -21,7 +21,14 @@
           (click)="toggleRegistration()">
     {{ isRegistrationOpen ? 'Iscrizioni Aperte' : 'Iscrizioni Chiuse' }}
   </button>
+
+  <button routerLink="/admin/classifiche" class="gestionale-btn">
+  Gestionale gara
+</button>
+
 </div>
+
+
 
 <!-- 📋 Tabella squadre -->
 <table *ngIf="teams.length > 0" class="admin-table" mat-table>

@@ -1,0 +1,87 @@
+<h2>Gestione Classifiche Torneo</h2>
+
+<!-- 🔹 Selezione opzioni -->
+<div style="margin-bottom: 1.5rem;">
+  <label for="eventDate">Data torneo:</label>
+  <select id="eventDate" [(ngModel)]="selectedDate" (change)="onDateChange()">
+    <option *ngFor="let d of availableDates" [value]="d">{{ d }}</option>
+  </select>
+
+  <label for="teamCount" style="margin-left: 1rem;">Numero squadre:</label>
+  <select id="teamCount" [(ngModel)]="selectedTeamCount" (change)="onTeamCountChange()">
+    <option *ngFor="let count of [12,13,14,15,16]" [value]="count">{{ count }}</option>
+  </select>
+</div>
+
+<!-- 🔹 Squadre selezionate -->
+<h3>Squadre selezionate ({{ filteredTeams.length }})</h3>
+<ul>
+  <li *ngFor="let team of filteredTeams">{{ team.teamName }}</li>
+</ul>
+
+<!-- 🔹 Assegnazione gironi -->
+<h3>Assegna le squadre ai gironi</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Squadra</th>
+      <th>Girone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let team of filteredTeams">
+      <td data-label="Squadra">{{ team.teamName }}</td>
+      <td data-label="Girone">
+        <select [value]="assegnazioni[team.teamName] || ''"
+                (change)="handleSelectChange($event, team.teamName)">
+          <option value="">--</option>
+          <option value="A">Girone A</option>
+          <option value="B">Girone B</option>
+          <option value="C">Girone C</option>
+          <option value="D">Girone D</option>
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- 🔹 Composizione gironi -->
+<h3>Composizione Gironi</h3>
+<div class="gironi-grid">
+  <div class="girone-block" *ngFor="let lettera of ['A', 'B', 'C', 'D']">
+    <h4>Girone {{ lettera }}</h4>
+    <ul>
+      <li *ngFor="let team of gironi[lettera]">{{ team.teamName }}</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 🔹 Genera match -->
+<button (click)="generaMatchGironi()">Calcola match gironi</button>
+
+<!-- 🔹 Visualizzazione match -->
+<div *ngIf="matchList.length > 0">
+  <h3>Calendario Match</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Girone</th>
+        <th>Team A</th>
+        <th>Team B</th>
+        <th>Arbitro</th>
+        <th>Campo</th>
+        <th>Round</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let match of matchList">
+        <td data-label="Girone">{{ match.girone }}</td>
+        <td data-label="Team A">{{ match.teamA }}</td>
+        <td data-label="Team B">{{ match.teamB }}</td>
+        <td data-label="Arbitro">{{ match.referee }}</td>
+        <td data-label="Campo">{{ match.field }}</td>
+        <td data-label="Round">{{ match.round }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

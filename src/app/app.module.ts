@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http'; // ✅ Importa HttpClientModule
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { routes } from './app.routes';
 
@@ -18,6 +19,7 @@ import { Home } from './home/home';
 import { RegistrationForm } from './registration-form/registration-form';
 import { Admin } from './admin/admin';
 import { LoginComponent } from './login';
+import { AdminClassificheComponent } from './admin-classifiche/admin-classifiche';
 
 @Component({
   selector: 'app-root',
@@ -27,13 +29,15 @@ import { LoginComponent } from './login';
 })
 export class AppComponent { }
 
+
 @NgModule({
   declarations: [
     AppComponent,
     Home,
     RegistrationForm,
     Admin,
-    LoginComponent
+    LoginComponent,
+    AdminClassificheComponent
   ],
   imports: [
     BrowserModule,
@@ -49,6 +53,7 @@ export class AppComponent { }
     MatSelectModule,
     MatCheckboxModule
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

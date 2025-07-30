@@ -43,7 +43,7 @@ app.post('/register', (req, res) => {
     registrations.push(newTeam);
     fs.writeFileSync(filePath, JSON.stringify(registrations, null, 2));
   });
-
+cd 
   res.json({ success: true, message: 'Iscrizione registrata.' });
 });
 
@@ -120,6 +120,19 @@ app.post('/admin/toggle-registration', (req, res) => {
   config.isRegistrationOpen = !config.isRegistrationOpen;
   setConfig(config);
   res.json({ success: true, isRegistrationOpen: config.isRegistrationOpen });
+});
+
+// Servizio dei file JSON per classifiche
+app.get('/registrations/:date', (req, res) => {
+  const date = req.params.date; // es. "2025-08-31"
+  const filename = `registrations-${date}.json`;
+  const filePath = path.join(__dirname, 'data', filename);
+
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: `File ${filename} non trovato.` });
+  }
 });
 
 // ✅ Avvio server

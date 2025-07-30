@@ -1,0 +1,130 @@
+:host {
+  display: block;
+  padding: 1.2rem;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(rgb(255, 81, 0), rgba(0, 0, 0, 0.5)),
+    url('https://source.unsplash.com/1600x900/?beach,volleyball') center/cover no-repeat;
+  color: #333;
+  font-size: 14px;
+}
+
+h2, h3, h4 {
+  margin-top: 3.8rem;
+  margin-bottom: 0.8rem;
+  color: #222;
+  font-size: 1.4rem;
+}
+
+/* Label e Select */
+label {
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+select {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  min-width: 100px;
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Tabelle */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 0.5rem 0.4rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* Lista squadre */
+ul {
+  padding-left: 1rem;
+  margin-top: 0.2rem;
+}
+
+li {
+  margin: 0.15rem 0;
+}
+
+/* Pulsanti */
+button {
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Gironi */
+.gironi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.girone-block {
+  flex: 1 1 180px;
+  background: #fff;
+  padding: 0.8rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+}
+
+/* Responsività */
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  tr {
+    margin-bottom: 0.8rem;
+    background: #fff;
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    flex-basis: 40%;
+  }
+
+  th {
+    display: none;
+  }
+}
