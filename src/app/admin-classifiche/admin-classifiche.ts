@@ -47,7 +47,7 @@ export class AdminClassificheComponent implements OnInit {
 }
 
 loadTeams() {
-  const url = `http://localhost:3000/registrations/${this.selectedDate}`;
+  const url = `https://volleyfans-bh.onrender.com/registrations/${this.selectedDate}`;
   this.http.get<Team[]>(url).subscribe({
     next: (data) => {
       console.log(`✅ Squadre caricate da ${url}:`, data);
