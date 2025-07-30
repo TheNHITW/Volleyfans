@@ -8,9 +8,20 @@
   </select>
 
   <label for="teamCount" style="margin-left: 1rem;">Numero squadre:</label>
-  <select id="teamCount" [(ngModel)]="selectedTeamCount" (change)="onTeamCountChange()">
-    <option *ngFor="let count of [12,13,14,15,16]" [value]="count">{{ count }}</option>
+  <select [(ngModel)]="selectedTeamCount" (change)="onTeamCountChange()">
+    <option *ngFor="let count of [12,13,14,15,16]" [ngValue]="count">{{ count }}</option>
   </select>
+</div>
+
+<!-- 🔹 Formula suggerita -->
+<div *ngIf="strutturaGironiSuggerita">
+  <h4>Formula di gara suggerita:</h4>
+  <ul>
+    <li *ngFor="let girone of gironiLettere">
+      Girone {{ girone }}: {{ strutturaGironiSuggerita[girone] || 0 }} squadre
+    </li>
+  </ul>
+  <button (click)="assegnaGironiAutomaticamente()">Assegna gironi automaticamente</button>
 </div>
 
 <!-- 🔹 Squadre selezionate -->
@@ -30,15 +41,12 @@
   </thead>
   <tbody>
     <tr *ngFor="let team of filteredTeams">
-      <td data-label="Squadra">{{ team.teamName }}</td>
-      <td data-label="Girone">
+      <td>{{ team.teamName }}</td>
+      <td>
         <select [value]="assegnazioni[team.teamName] || ''"
                 (change)="handleSelectChange($event, team.teamName)">
           <option value="">--</option>
-          <option value="A">Girone A</option>
-          <option value="B">Girone B</option>
-          <option value="C">Girone C</option>
-          <option value="D">Girone D</option>
+          <option *ngFor="let lettera of gironiLettere" [value]="lettera">Girone {{ lettera }}</option>
         </select>
       </td>
     </tr>
@@ -48,7 +56,7 @@
 <!-- 🔹 Composizione gironi -->
 <h3>Composizione Gironi</h3>
 <div class="gironi-grid">
-  <div class="girone-block" *ngFor="let lettera of ['A', 'B', 'C', 'D']">
+  <div class="girone-block" *ngFor="let lettera of gironiLettere">
     <h4>Girone {{ lettera }}</h4>
     <ul>
       <li *ngFor="let team of gironi[lettera]">{{ team.teamName }}</li>
@@ -59,7 +67,7 @@
 <!-- 🔹 Genera match -->
 <button (click)="generaMatchGironi()">Calcola match gironi</button>
 
-<!-- 🔹 Visualizzazione match -->
+<!-- 🔹 Calendario Match -->
 <div *ngIf="matchList.length > 0">
   <h3>Calendario Match</h3>
   <table>
@@ -75,13 +83,56 @@
     </thead>
     <tbody>
       <tr *ngFor="let match of matchList">
-        <td data-label="Girone">{{ match.girone }}</td>
-        <td data-label="Team A">{{ match.teamA }}</td>
-        <td data-label="Team B">{{ match.teamB }}</td>
-        <td data-label="Arbitro">{{ match.referee }}</td>
-        <td data-label="Campo">{{ match.field }}</td>
-        <td data-label="Round">{{ match.round }}</td>
+        <td>{{ match.girone }}</td>
+        <td>{{ match.teamA }}</td>
+        <td>{{ match.teamB }}</td>
+        <td>{{ match.referee }}</td>
+        <td>{{ match.field }}</td>
+        <td>{{ match.round }}</td>
       </tr>
     </tbody>
   </table>
+  <button (click)="generaPDF()">📄 Esporta in PDF</button>
 </div>
+
+<!-- 🔹 Matrice Risultati -->
+<h3>Matrice risultati - Tutti i Gironi</h3>
+
+<ng-container *ngFor="let girone of gironiLettere">
+  <div *ngIf="gironi[girone]?.length">
+    <h4>Girone {{ girone }}</h4>
+    <table class="matrice-risultati">
+      <thead>
+        <tr>
+          <th>Squadra</th>
+          <th *ngFor="let squadraCol of gironi[girone]">{{ squadraCol.teamName }}</th>
+          <th>Vittorie</th>
+          <th>Diff. Punti</th>
+          <th>Punti</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let squadraRow of gironi[girone]; let i = index">
+          <td>{{ squadraRow.teamName }}</td>
+          <td *ngFor="let squadraCol of gironi[girone]; let j = index">
+            <ng-container *ngIf="i !== j; else diagonale">
+              <input
+                type="text"
+                style="width: 40px; text-align: center;"
+                [value]="getDisplayValue(girone, squadraRow.teamName, squadraCol.teamName)"
+                (input)="aggiornaRisultatoConVittoria(girone, squadraRow.teamName, squadraCol.teamName, getInputValue($event))"
+              />
+            </ng-container>
+            <ng-template #diagonale>
+              <span style="color: #ccc;">—</span>
+            </ng-template>
+          </td>
+          <td>{{ calcolaVittorie(girone, squadraRow.teamName) }}</td>
+          <td>{{ calcolaDifferenzaPunti(girone, squadraRow.teamName) }}</td>
+          <td>{{ calcolaPuntiTotali(girone, squadraRow.teamName) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
+    <button (click)="generaPDFRisultati()">📄 Esporta risultati in PDF</button>

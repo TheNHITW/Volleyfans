@@ -97,6 +97,33 @@ button:hover {
   box-shadow: 0 1px 5px rgba(0,0,0,0.1);
 }
 
+.matrice-risultati {
+  border-collapse: collapse;
+  margin-top: 1rem;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.matrice-risultati th,
+.matrice-risultati td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+.matrice-risultati th {
+  background: #ff6600;
+  color: white;
+}
+
+.matrice-risultati tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
 /* Responsività */
 @media (max-width: 768px) {
   table, thead, tbody, th, td, tr {
