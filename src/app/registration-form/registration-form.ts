@@ -18,10 +18,17 @@ interface Player {
 export class RegistrationForm implements OnInit {
   registrationForm: FormGroup;
   registrationOpen = true;
+  dateOptions = [
+  { value: '2025-08-31', label: 'Domenica 31 Agosto 2025' },
+  { value: '2025-09-14', label: 'Domenica 14 Settembre 2025' },
+  { value: '2025-10-05', label: 'Domenica 5 Ottobre 2025' }
+];
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.registrationForm = this.fb.group({
       teamName: ['', Validators.required],
+      sport: ['', Validators.required],           
+      livello: ['', Validators.required],          
       phone: ['', [Validators.required, Validators.pattern('^[0-9]{7,15}$')]],
       players: this.fb.array([
         this.createPlayer(),
