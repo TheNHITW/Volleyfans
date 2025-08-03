@@ -29,8 +29,8 @@ export class Admin implements OnInit {
 
   readonly availableDates = [
     { label: '31 Agosto 2025', value: '2025-08-31' },
-    { label: '12 Settembre 2025', value: '2025-09-12' },
-    { label: '12 Ottobre 2025', value: '2025-10-12' }
+    { label: '14 Settembre 2025', value: '2025-09-14' },
+    { label: '5 Ottobre 2025', value: '2025-10-5' }
   ];
 
   constructor(private http: HttpClient) {}
