@@ -42,8 +42,7 @@ app.post('/register', (req, res) => {
 
     registrations.push(newTeam);
     fs.writeFileSync(filePath, JSON.stringify(registrations, null, 2));
-  });
-cd 
+  }); 
   res.json({ success: true, message: 'Iscrizione registrata.' });
 });
 
