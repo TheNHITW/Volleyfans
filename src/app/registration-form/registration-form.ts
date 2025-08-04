@@ -26,8 +26,7 @@ export class RegistrationForm implements OnInit {
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.registrationForm = this.fb.group({
-      teamName: ['', Validators.required],
-      sport: ['', Validators.required],           
+      teamName: ['', Validators.required],         
       livello: ['', Validators.required],          
       phone: ['', [Validators.required, Validators.pattern('^[0-9]{7,15}$')]],
       players: this.fb.array([
@@ -36,7 +35,7 @@ export class RegistrationForm implements OnInit {
         this.createPlayer(),
         this.createPlayer()
       ]),
-      selectedDates: [[], Validators.required],
+      selectedDates: [[], [Validators.required, this.minLengthArray(1)]],
       privacyConsent: [false, Validators.requiredTrue]
     });
   }
@@ -62,6 +61,14 @@ export class RegistrationForm implements OnInit {
   get players(): FormArray {
     return this.registrationForm.get('players') as FormArray;
   }
+
+  minLengthArray(min: number) {
+  return (control: FormArray | any) => {
+    return control && control.value && control.value.length >= min
+      ? null
+      : { minLengthArray: true };
+  };
+}
 
   onSubmit() {
     const formData = this.registrationForm.value;
