@@ -103,7 +103,7 @@ export class RegistrationForm implements OnInit {
     let allRegistrations: any[] = [];
 
     Promise.all(
-      allDates.map(date =>
+      allDates.map((date: string) =>
         this.http.get<any[]>(`${this.baseUrl}/admin/registrations?date=${date}`).toPromise()
       )
     ).then((results) => {
