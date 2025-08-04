@@ -377,10 +377,9 @@ generaStrutturaGironi(): { [key: string]: number } {
 
   switch (totalTeams) {
     case 12:
-      struttura['A'] = 3;
-      struttura['B'] = 3;
-      struttura['C'] = 3;
-      struttura['D'] = 3;
+      struttura['A'] = 4;
+      struttura['B'] = 4;
+      struttura['C'] = 4;
       break;
     case 13:
       struttura['A'] = 4;
