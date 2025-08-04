@@ -99,40 +99,45 @@ export class RegistrationForm implements OnInit {
       return;
     }
 
-    this.http.get<any[]>(`${this.baseUrl}/admin/registrations?date=${formData.selectedDates[0]}`)
-      .subscribe({
-      next: (registrations) => {
-        const teamNameTaken = registrations.some(t => t.teamName.trim().toLowerCase() === teamName);
-        if (teamNameTaken) {
-          alert('Nome squadra già iscritto.');
-          return;
-        }
+    const allDates = formData.selectedDates;
+    let allRegistrations: any[] = [];
 
-        const allRegisteredNames = registrations.flatMap(t =>
-          t.players.map((p: Player) => p.name.trim().toLowerCase())
-        );
-        const duplicated = names.find(name => allRegisteredNames.includes(name));
-        if (duplicated) {
-          alert(`Il giocatore "${duplicated}" è già iscritto in un'altra squadra.`);
-          return;
-        }
+    Promise.all(
+      allDates.map(date =>
+        this.http.get<any[]>(`${this.baseUrl}/admin/registrations?date=${date}`).toPromise()
+      )
+    ).then((results) => {
+      allRegistrations = results.flat();
 
-        this.http.post(`${this.baseUrl}/register`, formData)
-          .subscribe({
-            next: () => {
-              alert('Iscrizione inviata! Squadra registrata.');
-              this.registrationForm.reset();
-            },
-            error: (err) => {
-              console.error('Errore iscrizione:', err);
-              alert('Si è verificato un errore. Riprova.');
-            }
-          });
-      },
-      error: (err) => {
-        console.error('Errore durante il controllo duplicati:', err);
-        alert('Errore durante la verifica delle iscrizioni. Riprova più tardi.');
+      const teamNameTaken = allRegistrations.some(t => t.teamName.trim().toLowerCase() === teamName);
+      if (teamNameTaken) {
+        alert('Nome squadra già iscritto.');
+        return;
       }
+
+      const allRegisteredNames = allRegistrations.flatMap(t =>
+        t.players.map((p: Player) => p.name.trim().toLowerCase())
+      );
+      const duplicated = names.find(name => allRegisteredNames.includes(name));
+      if (duplicated) {
+        alert(`Il giocatore "${duplicated}" è già iscritto in un'altra squadra.`);
+        return;
+      }
+
+      this.http.post(`${this.baseUrl}/register`, formData)
+        .subscribe({
+          next: () => {
+            alert('Iscrizione inviata! Squadra registrata.');
+            this.registrationForm.reset();
+          },
+          error: (err) => {
+            console.error('Errore iscrizione:', err);
+            alert('Si è verificato un errore. Riprova.');
+          }
+        });
+    }).catch((err) => {
+      console.error('Errore durante la verifica delle iscrizioni:', err);
+      alert('Errore durante la verifica. Riprova più tardi.');
     });
   }
 }
