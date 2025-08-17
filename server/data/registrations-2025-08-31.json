@@ -1,314 +1,90 @@
 [
   {
-    "teamName": "Test1",
-    "phone": "3319048630",
+    "teamName": "Se me la dai",
+    "phone": "te l’appoggio",
     "players": [
       {
-        "name": "Lasdasdas",
-        "gender": "M"
+        "name": "3920333655",
+        "gender": "Daniele de Domincis"
       },
       {
-        "name": "asdasdadasd",
-        "gender": "M"
+        "name": "M",
+        "gender": "Davide de dominicis"
       },
       {
-        "name": "asdasdasdas",
-        "gender": "F"
+        "name": "M",
+        "gender": "Elena calderoni"
       },
       {
-        "name": "asdfgassdasd",
-        "gender": "F"
+        "name": "F",
+        "gender": "Francesca tomassi"
       }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test2",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test3",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test4",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test5",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
+    ]
   },
   {
-    "teamName": "Test6",
-    "phone": "3319048630",
+    "teamName": "Il torneo è annullato",
+    "phone": "3466438198",
     "players": [
       {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
+        "name": "Silvia Nobili",
         "gender": "F"
       },
       {
-        "name": "asdfljkdfj",
+        "name": "Gaia Scovacricchi",
         "gender": "F"
+      },
+      {
+        "name": "Mattia Di Panfilo",
+        "gender": "M"
+      },
+      {
+        "name": "Edoardo Angelini",
+        "gender": "M"
       }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test7",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test8",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test9",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test10",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
-  },
-    {
-    "teamName": "Test11",
-    "phone": "3319048630",
-    "players": [
-      {
-        "name": "asdfasddsa",
-        "gender": "M"
-      },
-      {
-        "name": "asdfkjsdhfk",
-        "gender": "M"
-      },
-      {
-        "name": "sdofsdfjo",
-        "gender": "F"
-      },
-      {
-        "name": "asdfljkdfj",
-        "gender": "F"
-      }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
+    ]
   },
   {
-    "teamName": "Test12",
-    "phone": "1239823983247",
+    "teamName": "Trallallero trallallà",
+    "phone": "3511902518",
     "players": [
       {
-        "name": "asdfklsdfjk",
+        "name": "Giovanni Ciavardini",
         "gender": "M"
       },
       {
-        "name": "asdfijdoifjo",
+        "name": "Lamberto Gobbi",
         "gender": "M"
       },
       {
-        "name": "asdoifjsdfoifsj",
+        "name": "Melissa Prata",
         "gender": "F"
       },
       {
-        "name": "sdfojsdfoj",
+        "name": "Emanuela Cerullo",
         "gender": "F"
       }
-    ],
-    "selectedDates": [
-      "2025-08-31"
-    ],
-    "privacyConsent": true
+    ]
+  },
+  {
+    "teamName": "Gli Sfaticati",
+    "phone": "3497086810",
+    "players": [
+      {
+        "name": "Matteo Battistoni",
+        "gender": "M"
+      },
+      {
+        "name": "Simone Ballini",
+        "gender": "M"
+      },
+      {
+        "name": "Arianna De Federicis",
+        "gender": "F"
+      },
+      {
+        "name": "Sofia Cantore",
+        "gender": "F"
+      }
+    ]
   }
 ]
