@@ -1,23 +1,23 @@
 [
   {
-    "teamName": "Se me la dai",
-    "phone": "te l’appoggio",
+    "teamName": "Se me la dai te l’appoggio",
+    "phone": "3920333655",
     "players": [
       {
-        "name": "3920333655",
-        "gender": "Daniele de Domincis"
+        "name": "Daniele de Domincis",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Davide de dominicis"
+        "name": "Davide de dominicis",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Elena calderoni"
+        "name": "Elena calderoni",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Francesca tomassi"
+        "name": "Francesca tomassi",
+        "gender": "F"
       }
     ]
   },
