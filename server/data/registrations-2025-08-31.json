@@ -86,5 +86,27 @@
         "gender": "F"
       }
     ]
+  },
+  {
+    "teamName": "C'è da spostare una panda",
+    "phone": "3473557264",
+    "players": [
+      {
+        "name": "Giuseppe mattia Messa",
+        "gender": "M"
+      },
+      {
+        "name": "Amelino Camilla",
+        "gender": "F"
+      },
+      {
+        "name": "Lorenzo Saveri",
+        "gender": "M"
+      },
+      {
+        "name": "Federica Simonetti",
+        "gender": "F"
+      }
+    ]
   }
 ]
