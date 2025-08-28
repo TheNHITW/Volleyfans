@@ -1,265 +1,287 @@
 [
   {
-    "teamName": "\"Se me la dai te l’appoggio\"",
-    "phone": "\"3920333655\"",
+    "teamName": "Se me la dai te l’appoggio",
+    "phone": "3920333655",
     "players": [
       {
-        "name": "\"Daniele de Domincis\"",
-        "gender": "\"M\""
+        "name": "Daniele de Domincis",
+        "gender": "M"
       },
       {
-        "name": "\"Davide de dominicis\"",
-        "gender": "\"M\""
+        "name": "Davide de dominicis",
+        "gender": "M"
       },
       {
-        "name": "\"Elena calderoni\"",
-        "gender": "\"F\""
+        "name": "Elena calderoni",
+        "gender": "F"
       },
       {
-        "name": "\"Francesca tomassi\"",
-        "gender": "\"F\""
+        "name": "Francesca tomassi",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"Il torneo è annullato\"",
-    "phone": "\"3466438198\"",
+    "teamName": "Il torneo è annullato",
+    "phone": "3466438198",
     "players": [
       {
-        "name": "\"Silvia Nobili\"",
-        "gender": "\"F\""
+        "name": "Silvia Nobili",
+        "gender": "F"
       },
       {
-        "name": "\"Gaia Scovacricchi\"",
-        "gender": "\"F\""
+        "name": "Gaia Scovacricchi",
+        "gender": "F"
       },
       {
-        "name": "\"Mattia Di Panfilo\"",
-        "gender": "\"M\""
+        "name": "Mattia Di Panfilo",
+        "gender": "M"
       },
       {
-        "name": "\"Edoardo Angelini\"",
-        "gender": "\"M\""
+        "name": "Edoardo Angelini",
+        "gender": "M"
       }
     ]
   },
   {
-    "teamName": "\"Trallallero trallallà\"",
-    "phone": "\"3511902518\"",
+    "teamName": "Trallallero trallallà",
+    "phone": "3511902518",
     "players": [
       {
-        "name": "\"Giovanni Ciavardini\"",
-        "gender": "\"M\""
+        "name": "Giovanni Ciavardini",
+        "gender": "M"
       },
       {
-        "name": "\"Lamberto Gobbi\"",
-        "gender": "\"M\""
+        "name": "Lamberto Gobbi",
+        "gender": "M"
       },
       {
-        "name": "\"Melissa Prata\"",
-        "gender": "\"F\""
+        "name": "Melissa Prata",
+        "gender": "F"
       },
       {
-        "name": "\"Emanuela Cerullo\"",
-        "gender": "\"F\""
+        "name": "Emanuela Cerullo",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"Gli Sfaticati\"",
-    "phone": "\"3497086810\"",
+    "teamName": "Gli Sfaticati",
+    "phone": "3497086810",
     "players": [
       {
-        "name": "\"Matteo Battistoni\"",
-        "gender": "\"M\""
+        "name": "Matteo Battistoni",
+        "gender": "M"
       },
       {
-        "name": "\"Simone Ballini\"",
-        "gender": "\"M\""
+        "name": "Simone Ballini",
+        "gender": "M"
       },
       {
-        "name": "\"Arianna De Federicis\"",
-        "gender": "\"F\""
+        "name": "Arianna De Federicis",
+        "gender": "F"
       },
       {
-        "name": "\"Sofia Cantore\"",
-        "gender": "\"F\""
+        "name": "Sofia Cantore",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"C'è da spostare una panda\"",
-    "phone": "\"3473557264\"",
+    "teamName": "C'è da spostare una panda",
+    "phone": "3473557264",
     "players": [
       {
-        "name": "\"Giuseppe mattia Messa\"",
-        "gender": "\"M\""
+        "name": "Giuseppe mattia Messa",
+        "gender": "M"
       },
       {
-        "name": "\"Amelino Camilla\"",
-        "gender": "\"F\""
+        "name": "Amelino Camilla",
+        "gender": "F"
       },
       {
-        "name": "\"Lorenzo Saveri\"",
-        "gender": "\"M\""
+        "name": "Lorenzo Saveri",
+        "gender": "M"
       },
       {
-        "name": "\"Federica Simonetti\"",
-        "gender": "\"F\""
+        "name": "Federica Simonetti",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"I colpi di sole\"",
-    "phone": "\"3332024005\"",
+    "teamName": "I colpi di sole",
+    "phone": "3332024005",
     "players": [
       {
-        "name": "\"Denise\"",
-        "gender": "\"F\""
+        "name": "Denise",
+        "gender": "F"
       },
       {
-        "name": "\"Costanza\"",
-        "gender": "\"F\""
+        "name": "Costanza",
+        "gender": "F"
       },
       {
-        "name": "\"Erik\"",
-        "gender": "\"M\""
+        "name": "Erik",
+        "gender": "M"
       },
       {
-        "name": "\"Giuliano\"",
-        "gender": "\"M\""
+        "name": "Giuliano",
+        "gender": "M"
       }
     ]
   },
   {
-    "teamName": "\"Fire Volley\"",
-    "phone": "\"3701331395\"",
+    "teamName": "Fire Volley",
+    "phone": "3701331395",
     "players": [
       {
-        "name": "\"Giovanni Filippi\"",
-        "gender": "\"M\""
+        "name": "Giovanni Filippi",
+        "gender": "M"
       },
       {
-        "name": "\"Valentino Tonini\"",
-        "gender": "\"M\""
+        "name": "Valentino Tonini",
+        "gender": "M"
       },
       {
-        "name": "\"Agnese Stipo\"",
-        "gender": "\"F\""
+        "name": "Agnese Stipo",
+        "gender": "F"
       },
       {
-        "name": "\"Verena Helga Cirilli\"",
-        "gender": "\"F\""
+        "name": "Verena Helga Cirilli",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"drinking team\"",
-    "phone": "\"3401694738\"",
+    "teamName": "drinking team",
+    "phone": "3401694738",
     "players": [
       {
-        "name": "\"Martina Gentile\"",
-        "gender": "\"F\""
+        "name": "Martina Gentile",
+        "gender": "F"
       },
       {
-        "name": "\"Valerio D’Angeli\"",
-        "gender": "\"M\""
+        "name": "Valerio D’Angeli",
+        "gender": "M"
       },
       {
-        "name": "\"Fabio Salustest\"",
-        "gender": "\"M\""
+        "name": "Fabio Salustest",
+        "gender": "M"
       },
       {
-        "name": "\"Valentina Rizzo\"",
-        "gender": "\"F\""
+        "name": "Valentina Rizzo",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"Squat Monopodalico\"",
-    "phone": "\"3513118827\"",
+    "teamName": "Squat Monopodalico",
+    "phone": "3513118827",
     "players": [
       {
-        "name": "\"Flavio Principato\"",
-        "gender": "\"M\""
+        "name": "Flavio Principato",
+        "gender": "M"
       },
       {
-        "name": "\"Riccardo Iancu\"",
-        "gender": "\"M\""
+        "name": "Riccardo Iancu",
+        "gender": "M"
       },
       {
-        "name": "\"Maila Giulioni\"",
-        "gender": "\"F\""
+        "name": "Maila Giulioni",
+        "gender": "F"
       },
       {
-        "name": "\"Giada Macrì\"",
-        "gender": "\"F\""
+        "name": "Giada Macrì",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"GOTA\"",
-    "phone": "\"3518887821\"",
+    "teamName": "GOTA",
+    "phone": "3518887821",
     "players": [
       {
-        "name": "\"Asia\"",
-        "gender": "\"F\""
+        "name": "Asia",
+        "gender": "F"
       },
       {
-        "name": "\"Flavio\"",
-        "gender": "\"M\""
+        "name": "Flavio",
+        "gender": "M"
       },
       {
-        "name": "\"Matteo\"",
-        "gender": "\"M\""
+        "name": "Matteo",
+        "gender": "M"
       },
       {
-        "name": "\"Ramona\"",
-        "gender": "\"F\""
+        "name": "Ramona",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"Supplì con panna\"",
-    "phone": "\"3294435280\"",
+    "teamName": "Supplì con panna",
+    "phone": "3294435280",
     "players": [
       {
-        "name": "\"Tamara Todisco\"",
-        "gender": "\"F\""
+        "name": "Tamara Todisco",
+        "gender": "F"
       },
       {
-        "name": "\"Simone Sorgonà\"",
-        "gender": "\"M\""
+        "name": "Simone Sorgonà",
+        "gender": "M"
       },
       {
-        "name": "\"Domenico Romeo\"",
-        "gender": "\"M\""
+        "name": "Domenico Romeo",
+        "gender": "M"
       },
       {
-        "name": "\"Cecilia Piscitelli\"",
-        "gender": "\"F\""
+        "name": "Cecilia Piscitelli",
+        "gender": "F"
       }
     ]
   },
   {
-    "teamName": "\"zasfpkjsdpoi\"",
-    "phone": "\"33190438593\"",
+    "teamName": "TELETUBBIES 2.0",
+    "phone": "3409745291",
     "players": [
       {
-        "name": "\"sdpfojfspo\"",
-        "gender": "\"M\""
+        "name": "Valeria Scovacricchi",
+        "gender": "F"
       },
       {
-        "name": "\"asdpfojsdpo\"",
-        "gender": "\"M\""
+        "name": "Valerio Nobili",
+        "gender": "M"
       },
       {
-        "name": "\"sdpfosfpoi\"",
-        "gender": "\"F\""
+        "name": "Marco Resitano",
+        "gender": "M"
       },
       {
-        "name": "\"sdfpojsdfpo\"",
-        "gender": "\"F\""
+        "name": "Martha Scarpata",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Spiaggia libera",
+    "phone": "3403899820",
+    "players": [
+      {
+        "name": "Alessandro Vesci",
+        "gender": "M"
+      },
+      {
+        "name": "Dario",
+        "gender": "M"
+      },
+      {
+        "name": "Francesca",
+        "gender": "F"
+      },
+      {
+        "name": "Adelina",
+        "gender": "F"
       }
     ]
   }

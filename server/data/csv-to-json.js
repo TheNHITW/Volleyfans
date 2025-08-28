@@ -14,6 +14,19 @@ const lines = csv.trim().split('\n');
 // Rimuovi intestazione
 const header = lines.shift();
 
+// Funzione che pulisce un campo rimuovendo eventuali virgolette esterne
+function clean(value) {
+  if (!value) return '';
+  let v = value.trim();
+  // se inizia e finisce con virgolette, rimuovile
+  if (v.startsWith('"') && v.endsWith('"')) {
+    v = v.slice(1, -1);
+  }
+  // rimuovi virgolette residue doppie
+  v = v.replace(/""/g, '"');
+  return v;
+}
+
 // Parsea righe rimanenti
 const teams = lines.map(line => {
   const [
@@ -26,13 +39,13 @@ const teams = lines.map(line => {
   ] = line.split(',');
 
   return {
-    teamName: teamName.trim(),
-    phone: phone.trim(),
+    teamName: clean(teamName),
+    phone: clean(phone),
     players: [
-      { name: p1.trim(), gender: g1.trim() },
-      { name: p2.trim(), gender: g2.trim() },
-      { name: p3.trim(), gender: g3.trim() },
-      { name: p4.trim(), gender: g4.trim() }
+      { name: clean(p1), gender: clean(g1) },
+      { name: clean(p2), gender: clean(g2) },
+      { name: clean(p3), gender: clean(g3) },
+      { name: clean(p4), gender: clean(g4) }
     ]
   };
 });
