@@ -63,57 +63,154 @@ export class AdminClassificheComponent implements OnInit {
 
   constructor(private http: HttpClient, private tournament: TournamentService) {}
 
-  private findMatchId(girone: string, teamA: string, teamB: string): string | null {
+private findMatchId(girone: string, teamA: string, teamB: string): string | null {
   const m = this.matchList.find(x =>
     x.girone === girone &&
-    ((x.teamA === teamA && x.teamB === teamB) || (x.teamA === teamB && x.teamB === teamA))
+    (
+      (this.nameEquals(x.teamA, teamA) && this.nameEquals(x.teamB, teamB)) ||
+      (this.nameEquals(x.teamA, teamB) && this.nameEquals(x.teamB, teamA))
+    )
   );
-  return m ? m.id : null;
+  return m ? (m.id ?? `${m.girone}-${m.teamA}-${m.teamB}-${m.round}-${m.field}`) : null;
+}
+
+// 👇 aggiungi in classe
+private matchById: Record<string, Match> = {};
+private teamsByGirone: Record<string, Set<string>> = {};
+
+private normalizeName(s: string): string {
+  if (!s) return '';
+  return s
+    .normalize('NFKC')
+    .replace(/[’‘`´]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+private nameEquals(a: string, b: string): boolean {
+  return this.normalizeName(a) === this.normalizeName(b);
+}
+
+private normalizeMatches(raw: any[] = []): Match[] {
+  const list = (raw || []).map((m: any) => ({
+    ...m,
+    round: Number(m?.round),
+    field: Number(m?.field),
+    id: m?.id ?? `${m.girone}-${m.teamA}-${m.teamB}-${Number(m?.round)}-${Number(m?.field)}`
+  }));
+  this.matchById = {};
+  for (const m of list) this.matchById[m.id] = m;
+  return list;
+}
+
+private buildTeamsByGirone() {
+  this.teamsByGirone = {};
+  for (const g of Object.keys(this.gironi)) {
+    this.teamsByGirone[g] = new Set((this.gironi[g] || []).map(t => t.teamName.trim()));
   }
+}
+
+private sameGirone(teamA: string, teamB: string, girone: string): boolean {
+  const set = this.teamsByGirone[girone] || new Set();
+  const norm = new Set(Array.from(set).map(n => this.normalizeName(n)));
+  return norm.has(this.normalizeName(teamA)) && norm.has(this.normalizeName(teamB));
+}
+
+private sortGironiInPlace() {
+  for (const g of Object.keys(this.gironi)) {
+    this.gironi[g].sort((a, b) =>
+      this.normalizeName(a.teamName).localeCompare(this.normalizeName(b.teamName))
+    );
+  }
+}
+
+private rehydrateTournament(data: any) {
+  // 1) Gironi
+  this.gironi = { A: [], B: [], C: [], D: [] };
+  for (const g of Object.keys(data?.groups || {})) {
+    this.gironi[g] = (data.groups[g] || []).map((t: any) =>
+      typeof t === 'string' ? { teamName: t, players: [] } : t
+    );
+  }
+  this.sortGironiInPlace();
+
+  // 2) Colonne
+  for (const g of Object.keys(this.gironi)) {
+    this.displayedColumns[g] = [
+      'num','teamName', ...this.gironi[g].map((_, j) => 'col' + j), 'wins','diff','points'
+    ];
+  }
+
+  // 3) Assegnazioni
+  this.assegnazioni = {};
+  for (const g of Object.keys(this.gironi)) {
+    for (const team of this.gironi[g]) this.assegnazioni[team.teamName] = g;
+  }
+
+  // 4) Match normalizzati + indici
+  this.matchList = this.normalizeMatches(data?.matches);
+  this.buildTeamsByGirone();
+
+  // 5) Matrice risultati
+  this.initRisultatiGironi();
+
+// 6) Applica results validi con orientamento allineato al match
+const results = data?.results || {};
+let applied = 0, discarded = 0;
+
+for (const id of Object.keys(results)) {
+  const r = results[id];
+  const m = this.matchById[id];
+  if (!m) { discarded++; continue; }
+
+  const rA = (r.teamA || '').trim();
+  const rB = (r.teamB || '').trim();
+
+  const sameOrder =
+    (this.nameEquals(rA, m.teamA) && this.nameEquals(rB, m.teamB));
+  const reversedOrder =
+    (this.nameEquals(rA, m.teamB) && this.nameEquals(rB, m.teamA));
+
+  if (!sameOrder && !reversedOrder) { discarded++; continue; }
+  if (!this.sameGirone(rA, rB, m.girone)) { discarded++; continue; }
+
+  // ⬇️ riallinea i punteggi all'ordine del match (m.teamA / m.teamB)
+  const puntiA_for_matchTeamA = sameOrder ? r.puntiA : r.puntiB;
+  const puntiB_for_matchTeamB = sameOrder ? r.puntiB : r.puntiA;
+
+  // scrivi matrice coerente: cella [A][B] = punti di A, [B][A] simmetrico
+  this.risultatiGironi[m.girone][m.teamA][m.teamB] = {
+    puntiA: puntiA_for_matchTeamA,
+    puntiB: puntiB_for_matchTeamB
+  };
+  this.risultatiGironi[m.girone][m.teamB][m.teamA] = {
+    puntiA: puntiB_for_matchTeamB,
+    puntiB: puntiA_for_matchTeamA
+  };
+
+  applied++;
+  }
+  console.log(`♻️ Merge results orientato: applied=${applied}, discarded=${discarded}`);
+
+  // 7) Fallback: usa match.score dove manca
+  for (const m of this.matchList) {
+    const tA = m.teamA?.trim(), tB = m.teamB?.trim(), g = m.girone;
+    const cell = this.risultatiGironi[g]?.[tA]?.[tB];
+    if (!cell) continue;
+    const alreadySet = cell.puntiA != null && cell.puntiB != null;
+    if (!alreadySet && m.score && m.score.puntiA != null && m.score.puntiB != null) {
+      if (!this.sameGirone(tA, tB, g)) continue;
+      this.risultatiGironi[g][tA][tB] = { puntiA: m.score.puntiA, puntiB: m.score.puntiB };
+      this.risultatiGironi[g][tB][tA] = { puntiA: m.score.puntiB, puntiB: m.score.puntiA };
+    }
+  }
+}
 
 ngOnInit() {
   this.loadTeams();
-
-  // 👇 carico subito lo stato del torneo per la data selezionata
   this.tournament.getTournament(this.selectedDate).subscribe({
-    next: (data: any) => {
-      // normalizza gironi
-      this.gironi = { A: [], B: [], C: [], D: [] };
-
-      for (const g of Object.keys(data.groups || {})) {
-        this.gironi[g] = (data.groups[g] || []).map((t: any) =>
-          typeof t === 'string' ? { teamName: t, players: [] } : t
-        );
-      }
-
-      // ricostruisci assegnazioni
-      this.assegnazioni = {};
-      for (const g of Object.keys(this.gironi)) {
-        for (const team of this.gironi[g]) {
-          this.assegnazioni[team.teamName] = g;
-        }
-      }
-
-      // ripristina match
-      this.matchList = data.matches || [];
-
-      // ricostruzione risultatiGironi
-      this.risultatiGironi = {};
-      for (const matchId in data.results || {}) {
-        const r = data.results[matchId];
-        const girone = r.girone || this.matchList.find(m => m.id === matchId)?.girone;
-        if (!girone) continue;
-
-        if (!this.risultatiGironi[girone]) this.risultatiGironi[girone] = {};
-        if (!this.risultatiGironi[girone][r.teamA]) this.risultatiGironi[girone][r.teamA] = {};
-        if (!this.risultatiGironi[girone][r.teamB]) this.risultatiGironi[girone][r.teamB] = {};
-
-        this.risultatiGironi[girone][r.teamA][r.teamB] = { puntiA: r.puntiA, puntiB: r.puntiB };
-        this.risultatiGironi[girone][r.teamB][r.teamA] = { puntiA: r.puntiB, puntiB: r.puntiA };
-      }
-
-      console.log('📊 Stato torneo ricaricato all\'avvio:', data);
-    },
+    next: (data: any) => { this.rehydrateTournament(data); },
     error: (e: any) => {
       console.error('❌ Errore caricamento torneo all\'avvio', e);
       this.gironi = { A:[], B:[], C:[], D:[] };
@@ -126,57 +223,8 @@ ngOnInit() {
 
 onDateChange() {
   this.loadTeams();
-
   this.tournament.getTournament(this.selectedDate).subscribe({
-    next: (data: any) => {
-      // ✅ normalizza gironi (stringhe → Team[])
-      this.gironi = { A: [], B: [], C: [], D: [] };
-
-      for (const g of Object.keys(data.groups || {})) {
-        this.gironi[g] = (data.groups[g] || []).map((t: any) =>
-          typeof t === 'string' ? { teamName: t, players: [] } : t
-        );
-      }
-      // costruisci le colonne per ogni girone
-      for (const g of Object.keys(this.gironi)) {
-        this.displayedColumns[g] = [
-          'num',
-          'teamName',
-          ...this.gironi[g].map((_, j) => 'col' + j),
-          'wins',
-          'diff',
-          'points'
-        ];
-      }
-
-      // ✅ ricostruisco assegnazioni (per i <select>)
-      this.assegnazioni = {};
-      for (const g of Object.keys(this.gironi)) {
-        for (const team of this.gironi[g]) {
-          this.assegnazioni[team.teamName] = g;
-        }
-      }
-
-      // ✅ ripristino match
-      this.matchList = data.matches || [];
-
-      // ✅ ricostruzione risultatiGironi in formato tabella
-      this.risultatiGironi = {};
-      for (const matchId in data.results || {}) {
-        const r = data.results[matchId];
-        const girone = r.girone || this.matchList.find(m => m.id === matchId)?.girone;
-        if (!girone) continue;
-
-        if (!this.risultatiGironi[girone]) this.risultatiGironi[girone] = {};
-        if (!this.risultatiGironi[girone][r.teamA]) this.risultatiGironi[girone][r.teamA] = {};
-        if (!this.risultatiGironi[girone][r.teamB]) this.risultatiGironi[girone][r.teamB] = {};
-
-        this.risultatiGironi[girone][r.teamA][r.teamB] = { puntiA: r.puntiA, puntiB: r.puntiB };
-        this.risultatiGironi[girone][r.teamB][r.teamA] = { puntiA: r.puntiB, puntiB: r.puntiA };
-      }
-
-      console.log('📊 Stato torneo ricaricato:', data);
-    },
+    next: (data: any) => { this.rehydrateTournament(data); },
     error: (e: any) => {
       console.error('❌ Errore caricamento torneo', e);
       this.gironi = { A:[], B:[], C:[], D:[] };
@@ -186,8 +234,6 @@ onDateChange() {
     }
   });
 }
-
-
 
 loadTeams() {
   this.tournament.getTeams(this.selectedDate).subscribe({
@@ -273,7 +319,6 @@ getGroupedRounds(): { round: number; matches: Match[] }[] {
     .sort((a, b) => a.round - b.round);
 }
 
-// Evita che Angular ricicli DOM tra round diversi
 trackMatch = (_: number, m: Match) =>
   m.id ?? `${m.girone}-${m.teamA}-${m.teamB}-${m.round}-${m.field}`;
 
@@ -314,23 +359,20 @@ initRisultatiGironi() {
 }
 
 aggiornaGironi() {
-  this.gironi = { A: [], B: [], C: [], D: [] };
+  const nuovi: Gironi = { A: [], B: [], C: [], D: [] };
   for (const team of this.filteredTeams) {
-    const girone = this.assegnazioni[team.teamName];
-    if (girone) {
-      this.gironi[girone].push(team);
-      this.initRisultatiGironi();
-    }
+    const g = this.assegnazioni[team.teamName];
+    if (g) nuovi[g].push(team);
   }
-  // costruisci le colonne per ogni girone
+  this.gironi = nuovi;
+
+  this.sortGironiInPlace();
+  this.initRisultatiGironi();
+  this.buildTeamsByGirone();
+
   for (const g of Object.keys(this.gironi)) {
     this.displayedColumns[g] = [
-      'num',
-      'teamName',
-      ...this.gironi[g].map((_, j) => 'col' + j),
-      'wins',
-      'diff',
-      'points'
+      'num','teamName', ...this.gironi[g].map((_, j) => 'col' + j), 'wins','diff','points'
     ];
   }
 }
@@ -339,18 +381,8 @@ generaMatchGironi() {
   this.tournament.generateMatches(this.selectedDate).subscribe({
     next: (res: any) => {
       const raw = Array.isArray(res?.matches) ? res.matches : [];
-
-      // 🔧 Coercizza i numeri + id stabile per trackBy
-      this.matchList = raw.map((m: any) => ({
-        ...m,
-        round: Number(m?.round),
-        field: Number(m?.field),
-        id: `${m.girone}-${m.teamA}-${m.teamB}-${m.round}-${m.field}`
-      }));
-
-      // (Opzionale) log di verifica: tutti number?
-      console.log(
-        '🗓️ Match generati dal server (normalizzati):',
+      this.matchList = this.normalizeMatches(raw);
+      console.log('🗓️ Match generati (normalizzati):',
         this.matchList.map(x => ({ round: x.round, field: x.field, girone: x.girone, A: x.teamA, B: x.teamB }))
       );
     },
@@ -650,9 +682,9 @@ getClassificheTuttiGironi(): Record<string, TeamStats[]> {
 
 getDisplayValue(girone: string, teamA: string, teamB: string): string | number {
   const match = this.risultatiGironi[girone]?.[teamA]?.[teamB];
-  if (!match) return '';
+  if (!match || match.puntiA == null || match.puntiB == null) return '';
   if (match.puntiA === 21) return 'V';
-  return match.puntiA ?? '';
+  return match.puntiA;
 }
 
 aggiornaRisultatoConVittoria(girone: string, teamA: string, teamB: string, input: string) {
@@ -663,25 +695,60 @@ aggiornaRisultatoConVittoria(girone: string, teamA: string, teamB: string, input
   let puntiA: number | null = null;
   let puntiB: number | null = null;
 
+  // 🔹 input "V" = vittoria secca 21–0
   if (input.trim().toUpperCase() === 'V') {
-    puntiA = 21; puntiB = 0;
+    puntiA = 21;
+    puntiB = 0;
   } else {
     const punti = parseInt(input, 10);
-    if (!isNaN(punti)) { puntiA = punti; puntiB = 21; }
+    if (!isNaN(punti)) {
+      puntiA = punti;
+      puntiB = 21;
+    }
   }
 
+  // aggiorna la matrice locale (tabella a specchio)
   this.risultatiGironi[girone][teamA][teamB] = { puntiA, puntiB };
   this.risultatiGironi[girone][teamB][teamA] = { puntiA: puntiB, puntiB: puntiA };
 
-  // 🔗 salva anche sul backend
-  const matchId = this.findMatchId(girone, teamA, teamB);
-  if (matchId && puntiA != null && puntiB != null) {
-    this.tournament.saveResult(this.selectedDate, matchId, puntiA, puntiB).subscribe({
-      next: (res: any) => console.log('✅ Risultato salvato su server', res),
-      error: (e: any) => console.error('❌ Errore salvataggio risultato', e)
-    });
+  // trova il match corrispondente
+  const m = this.matchList.find(x =>
+    x.girone === girone &&
+    (
+      (this.nameEquals(x.teamA, teamA) && this.nameEquals(x.teamB, teamB)) ||
+      (this.nameEquals(x.teamA, teamB) && this.nameEquals(x.teamB, teamA))
+    )
+  );
+  if (!m || puntiA == null || puntiB == null) return;
+
+  // 🔹 orienta i punti rispetto all'ordine del match
+  let puntiForMatchA: number;
+  let puntiForMatchB: number;
+
+  if (this.nameEquals(teamA, m.teamA) && this.nameEquals(teamB, m.teamB)) {
+    // ordine corrisponde
+    puntiForMatchA = puntiA;
+    puntiForMatchB = puntiB;
+  } else {
+    // ordine invertito
+    puntiForMatchA = puntiB;
+    puntiForMatchB = puntiA;
   }
+
+  // salva sul backend, passando anche i nomi per sicurezza
+  this.tournament.saveResult(
+    this.selectedDate,
+    m.id,
+    puntiForMatchA,
+    puntiForMatchB,
+    teamA,
+    teamB
+  ).subscribe({
+    next: res => console.log('✅ Risultato salvato su server', res),
+    error: e => console.error('❌ Errore salvataggio risultato', e)
+  });
 }
+
 
 generaStrutturaGironi(): { [key: string]: number } {
   const totalTeams = this.selectedTeamCount;

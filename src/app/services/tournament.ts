@@ -33,9 +33,23 @@ export class TournamentService {
     return this.http.get<any[]>(`${this.baseUrl}/admin/${date}/matches`);
   }
 
-  saveResult(date: string, matchId: string, puntiA: number, puntiB: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/admin/${date}/result`, { matchId, puntiA, puntiB });
-  }
+saveResult(
+  date: string,
+  matchId: string,
+  puntiA: number,
+  puntiB: number,
+  teamAName: string,
+  teamBName: string
+) {
+  return this.http.post(`${this.baseUrl}/admin/${date}/result`, {
+    matchId,
+    puntiA,
+    puntiB,
+    teamAName,
+    teamBName
+  });
+}
+
 
   getStandings(date: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/admin/${date}/standings`);

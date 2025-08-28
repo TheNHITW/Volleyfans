@@ -1,7 +1,7 @@
 <main class="register-page">
   <div class="register-container">
     <img class="register-logo" src="logo.png" alt="Logo Torneo">
-    <h1>Iscriviti all'Aperivolley</h1>
+    <h1>Iscriviti all'aperitivo</h1>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!isSubmitted">
       <mat-form-field appearance="fill" class="full-width">
@@ -10,7 +10,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Con quante persone verrai all'Aperivolley?</mat-label>
+        <mat-label>Con quante persone verrai all'aperitivo?</mat-label>
         <input matInput formControlName="age" type="number" required>
       </mat-form-field>
 

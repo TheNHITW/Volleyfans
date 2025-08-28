@@ -21,7 +21,8 @@ function getFilePathForDate(date) {
   return path.join(ensureDir(), `registrations-${date}.json`);
 }
 function getTournamentFile(date) {
-  return path.join(ensureDir(), `tournament-${date}.json`);
+  const dir = ensureDir();
+  return path.join(dir, `tournament-${date}.json`);
 }
 function readTournament(date) {
   const filePath = getTournamentFile(date);
@@ -143,16 +144,41 @@ app.get('/admin/:date/matches', (req, res) => {
   res.json(data.matches || []);
 });
 
+// 🔥 SALVATAGGIO RISULTATO con orientamento a (match.teamA / match.teamB)
 app.post('/admin/:date/result', (req, res) => {
   const { date } = req.params;
-  const { matchId, puntiA, puntiB } = req.body;
+  const { matchId, puntiA, puntiB, teamAName, teamBName } = req.body; // ← aggiunti opzionali
   const data = readTournament(date);
 
   const match = (data.matches || []).find(m => m.id === matchId);
   if (!match) return res.status(404).json({ success: false, message: 'Match non trovato' });
 
-  match.score = { puntiA, puntiB };
-  data.results[matchId] = { teamA: match.teamA, teamB: match.teamB, puntiA, puntiB };
+  // Se il client passa i nomi della cella, li usiamo per capire se invertire
+  let a = Number(puntiA);
+  let b = Number(puntiB);
+
+  const norm = s => (s || '').normalize('NFKC')
+    .replace(/[’‘`´]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+  if (teamAName && teamBName) {
+    const sameOrder =
+      norm(teamAName) === norm(match.teamA) && norm(teamBName) === norm(match.teamB);
+    const reversedOrder =
+      norm(teamAName) === norm(match.teamB) && norm(teamBName) === norm(match.teamA);
+
+    if (reversedOrder) {
+      // 👈 lo user ha inserito i punti come (match.teamB vs match.teamA): swappo
+      const tmp = a; a = b; b = tmp;
+    }
+    // se non corrispondono, lascio com'è ma potrei anche rifiutare
+  }
+
+  // Salva puntando SEMPRE all'ordine del match
+  match.score = { puntiA: a, puntiB: b };
+  data.results[matchId] = { teamA: match.teamA, teamB: match.teamB, puntiA: a, puntiB: b };
 
   data.standings = computeStandings(data);
   writeTournament(date, data);
@@ -162,6 +188,7 @@ app.post('/admin/:date/result', (req, res) => {
 app.get('/admin/:date/standings', (req, res) => {
   const { date } = req.params;
   const data = readTournament(date);
+  // opzionale: ricalcolare sempre
   data.standings = computeStandings(data);
   writeTournament(date, data);
   res.json(data.standings || {});
@@ -203,19 +230,16 @@ function generateMatchesForAllGroups(groups) {
 
   while (Object.values(queues).some(q => q.length > 0)) {
     let field = 1;
-
     for (const g of Object.keys(queues).sort()) {
       if (queues[g].length > 0) {
-        const match = queues[g].shift(); // prendi il prossimo match del girone
+        const match = queues[g].shift();
         match.round = round;
         match.field = field++;
         scheduled.push(match);
       }
     }
-
     round++;
   }
-
   return scheduled;
 }
 
@@ -231,7 +255,7 @@ function computeStandings(data) {
 
   const lookup = {};
   for (const g in standings) {
-    standings[g].forEach(r => (lookup[`${g}:${r.team}`] = r));
+    standings[g].forEach(row => (lookup[`${g}:${row.team}`] = row));
   }
 
   for (const m of data.matches) {
@@ -251,7 +275,6 @@ function computeStandings(data) {
     standings[g].forEach(r => r.diff = r.pf - r.pa);
     standings[g].sort((a, b) => b.wins - a.wins || b.diff - a.diff || b.pf - a.pf);
   }
-
   return standings;
 }
 
@@ -259,25 +282,6 @@ function computeStandings(data) {
 app.listen(PORT, () => {
   console.log(`🚀 Backend + Frontend in ascolto su http://localhost:${PORT}`);
 });
-
-// ✅ Utility torneo
-function getTournamentFile(date) {
-  const dir = path.join(__dirname, 'data');
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  return path.join(dir, `tournament-${date}.json`);
-}
-
-function readTournament(date) {
-  const filePath = getTournamentFile(date);
-  if (!fs.existsSync(filePath)) {
-    return { date, groups: {}, matches: [], results: {}, standings: {} };
-  }
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-function writeTournament(date, data) {
-  fs.writeFileSync(getTournamentFile(date), JSON.stringify(data, null, 2));
-}
 
 // ✅ Salva gironi
 app.post('/admin/:date/groups', (req, res) => {
@@ -372,42 +376,6 @@ app.get('/admin/:date/standings', (req, res) => {
   const data = readTournament(date);
   res.json(data.standings || {});
 });
-
-// Funzione calcolo standings
-function computeStandings(data) {
-  const standings = {};
-  for (const g in data.groups) {
-    standings[g] = data.groups[g].map(team => ({
-      team,
-      wins: 0, pf: 0, pa: 0, diff: 0, points: 0
-    }));
-  }
-
-  const lookup = {};
-  for (const g in standings) {
-    standings[g].forEach((row, i) => lookup[`${g}:${row.team}`] = row);
-  }
-
-  for (const m of data.matches) {
-    if (!m.score) continue;
-    const { puntiA, puntiB } = m.score;
-    const rowA = lookup[`${m.girone}:${m.teamA}`];
-    const rowB = lookup[`${m.girone}:${m.teamB}`];
-
-    rowA.pf += puntiA; rowA.pa += puntiB;
-    rowB.pf += puntiB; rowB.pa += puntiA;
-
-    if (puntiA > puntiB) { rowA.wins++; rowA.points += 3; }
-    else if (puntiB > puntiA) { rowB.wins++; rowB.points += 3; }
-  }
-
-  for (const g in standings) {
-    standings[g].forEach(r => r.diff = r.pf - r.pa);
-    standings[g].sort((a,b) => b.wins - a.wins || b.diff - a.diff || b.pf - a.pf);
-  }
-
-  return standings;
-}
 
 // ✅ Campo suggerito per girone
 function fieldForGirone(g) {
