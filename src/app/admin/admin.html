@@ -8,13 +8,11 @@
       {{ date.label }}
     </mat-option>
   </mat-select>
-</mat-form-field>
+  </mat-form-field>
 
 <!-- 🔘 Pulsanti principali -->
 <div class="admin-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-  <button mat-raised-button color="accent" (click)="exportToCSV()">
-    Esporta CSV
-  </button>
+  <button mat-raised-button class="csv-btn" (click)="exportToCSV()">Esporta CSV</button>
 
   <button mat-raised-button
           [ngClass]="isRegistrationOpen ? 'btn-open' : 'btn-closed'"
@@ -22,50 +20,84 @@
     {{ isRegistrationOpen ? 'Iscrizioni Aperte' : 'Iscrizioni Chiuse' }}
   </button>
 
-  <button routerLink="/admin/classifiche" class="gestionale-btn">
-  Gestionale gara
-</button>
-
+  <button mat-raised-button class="gestionale-btn" routerLink="/admin/classifiche">Gestionale gara</button>
 </div>
 
+<!-- 📋 Tabella squadre (Angular Material) -->
+<table
+  mat-table
+  [dataSource]="teams"
+  class="mat-elevation-z1 admin-table"
+  *ngIf="teams?.length">
 
+  <!-- Nome Squadra -->
+  <ng-container matColumnDef="teamName">
+    <th mat-header-cell *matHeaderCellDef>Nome Squadra</th>
+    <td mat-cell *matCellDef="let team">{{ team.teamName }}</td>
+  </ng-container>
 
-<!-- 📋 Tabella squadre -->
-<table *ngIf="teams.length > 0" class="admin-table" mat-table>
-  <thead>
-    <tr>
-      <th>Nome Squadra</th>
-      <th>Telefono</th>
-      <th>Giocatore 1</th>
-      <th>Sesso 1</th>
-      <th>Giocatore 2</th>
-      <th>Sesso 2</th>
-      <th>Giocatore 3</th>
-      <th>Sesso 3</th>
-      <th>Giocatore 4</th>
-      <th>Sesso 4</th>
-      <th>Azioni</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let team of teams">
-      <td>{{ team.teamName }}</td>
-      <td>{{ team.phone }}</td>
-      <td>{{ team.players[0].name }}</td>
-      <td>{{ team.players[0].gender }}</td>
-      <td>{{ team.players[1].name }}</td>
-      <td>{{ team.players[1].gender }}</td>
-      <td>{{ team.players[2].name }}</td>
-      <td>{{ team.players[2].gender }}</td>
-      <td>{{ team.players[3].name }}</td>
-      <td>{{ team.players[3].gender }}</td>
-      <td>
-        <button mat-button color="warn" (click)="deleteTeam(team.teamName)">
-          Cancella
-        </button>
-      </td>
-    </tr>
-  </tbody>
+  <!-- Telefono -->
+  <ng-container matColumnDef="phone">
+    <th mat-header-cell *matHeaderCellDef>Telefono</th>
+    <td mat-cell *matCellDef="let team">{{ team.phone || '—' }}</td>
+  </ng-container>
+
+  <!-- Giocatore 1 / Sesso 1 -->
+  <ng-container matColumnDef="p1Name">
+    <th mat-header-cell *matHeaderCellDef>Giocatore 1</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 0, 'name') }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="p1Gender">
+    <th mat-header-cell *matHeaderCellDef>Sesso 1</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 0, 'gender') }}</td>
+  </ng-container>
+
+  <!-- Giocatore 2 / Sesso 2 -->
+  <ng-container matColumnDef="p2Name">
+    <th mat-header-cell *matHeaderCellDef>Giocatore 2</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 1, 'name') }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="p2Gender">
+    <th mat-header-cell *matHeaderCellDef>Sesso 2</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 1, 'gender') }}</td>
+  </ng-container>
+
+  <!-- Giocatore 3 / Sesso 3 -->
+  <ng-container matColumnDef="p3Name">
+    <th mat-header-cell *matHeaderCellDef>Giocatore 3</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 2, 'name') }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="p3Gender">
+    <th mat-header-cell *matHeaderCellDef>Sesso 3</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 2, 'gender') }}</td>
+  </ng-container>
+
+  <!-- Giocatore 4 / Sesso 4 -->
+  <ng-container matColumnDef="p4Name">
+    <th mat-header-cell *matHeaderCellDef>Giocatore 4</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 3, 'name') }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="p4Gender">
+    <th mat-header-cell *matHeaderCellDef>Sesso 4</th>
+    <td mat-cell *matCellDef="let team">{{ getPlayer(team, 3, 'gender') }}</td>
+  </ng-container>
+
+  <!-- Azioni -->
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Azioni</th>
+    <td mat-cell *matCellDef="let team">
+      <button mat-button color="warn" (click)="deleteTeam(team.teamName)">Cancella</button>
+    </td>
+  </ng-container>
+
+  <!-- Righe -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row        *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 
-<p *ngIf="teams.length === 0">Nessuna squadra iscritta per la data selezionata.</p>
+<p *ngIf="!teams?.length">Nessuna squadra iscritta per la data selezionata.</p>
+

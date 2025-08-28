@@ -5,7 +5,15 @@ html, body {
   display: flex;
   flex-direction: column;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  overflow-x: hidden; /* blocca overflow laterale */
+  overflow-x: hidden;
+  color: #040442;
+}
+
+/* ==== PAGINA ADMIN ==== */
+.admin {
+  min-height: 100vh;
+  padding: 20px;
+  background: rgba(238, 0, 0, 0.05); /* sfondo leggero, non rosso pieno */
 }
 
 /* ==== NAVBAR ==== */
@@ -29,66 +37,20 @@ html, body {
   font-weight: bold;
   font-size: 16px;
   padding: 8px 16px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 6px;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .nav-center a:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .nav-center a.active-link {
-  background: #1a1f42;           
-  color: #ff6600;                
-  border: 2px solid #ff6600;     
-  border-radius: 20px;           
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
-}
-
-/* ==== HERO ==== */
-.hero {
-  flex: 1 0 auto;
-  min-height: calc(100vh - 64px - 80px); /* altezza schermo - navbar - footer */
-  background: linear-gradient(to bottom, #ff6600, #c75a2c);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.hero-logo {
-  max-width: 200px;
-  width: 100%;
-  height: auto;
-  margin-bottom: 20px;
-}
-
-.hero-title {
-  font-size: 48px;
-  font-weight: bold;
-  color: #1a1f42;
-  margin: 0 0 10px;
-}
-
-.hero-date {
-  font-size: 24px;
-  font-weight: bold;
-  color: #1a1f42;
-  margin: 0;
-}
-
-/* ==== FOOTER ==== */
-.footer {
-  flex-shrink: 0;
-  text-align: center;
-  padding: 20px;
   background: #1a1f42;
-  color: white;
-  width: 100%;
-  box-sizing: border-box;
-  font-size: 0.9rem;
+  color: #ff6600;
+  border: 2px solid #ff6600;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 /* ==== TITOLI ==== */
@@ -98,159 +60,126 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* ==== BUTTON CONTAINER ==== */
-.button-container {
+/* ==== BUTTONS ==== */
+.admin-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin: 20px 0;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  
 }
 
-/* ==== STILE BASE PER TUTTI I BOTTONI ==== */
-button {
+button, .mat-raised-button {
   padding: 10px 20px;
   font-size: 16px;
   background: #ff6600;
   color: white;
-  border: none;
   border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
   min-width: 140px;
-  text-align: center;
+  transition: background 0.3s ease;
 }
 
-/* Hover comune */
-button:hover {
-  background: #e25500;
+button:hover, .mat-raised-button:hover {
+  background: #ff6200;
 }
 
-/* ==== VARIANTI BOTTONI ==== */
 .btn-open {
-  background-color: #4caf50;
+  background-color: #4caf50 !important;
+  color:#f9f9f9
 }
 .btn-open:hover {
-  background-color: #3e9143;
+  background-color: #036e0a !important;
 }
 
 .btn-closed {
-  background-color: #f44336;
+  background-color: #f44336 !important;
 }
 .btn-closed:hover {
-  background-color: #d32f2f;
+  background-color: #d32f2f !important;
+}
+
+.csv-btn {
+  background-color: #007bff  !important;
+  color:#f9f9f9
+}
+
+.csv-btn:hover {
+  background-color: #0456af !important;
 }
 
 .gestionale-btn {
-  background-color: #007bff;
+  background-color: #007bff !important;
+  color:#f9f9f9
 }
 .gestionale-btn:hover {
-  background-color: #0056b3;
+  background-color: #0456af !important;
 }
 
+/* ==== TABELLA ==== */
+.table-wrapper {
+  overflow-x: auto; /* scroll su mobile */
+}
 
-/* ==== TABELLE ==== */
-table {
+.admin-table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background: white;
   border-radius: 8px;
   overflow: hidden;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 12px 8px;
-  text-align: center;
-}
-
-th {
-  background-color: #ff6600;
+.admin-table .mat-mdc-header-cell {
+  background: #ff6600;
   color: white;
-}
-
-tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-tr:hover {
-  background-color: #f1f1f1;
-}
-
-/* ==== PARAGRAFI ==== */
-p {
-  text-align: center;
-  margin-top: 40px;
-  color: #1a1f42;
   font-weight: bold;
+  text-align: center;
+  border-right: 1px solid #ddd;
+
 }
 
-/* ==== MEDIA QUERY 768px ==== */
+.admin-table .mat-mdc-cell {
+  text-align: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+.admin-table .mat-mdc-row:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.admin-table .mat-mdc-row:hover {
+  background: #f1f1f1;
+}
+
+/* ==== MEDIA QUERIES ==== */
 @media (max-width: 768px) {
   .nav-center {
     flex-direction: column;
     gap: 10px;
   }
 
-  .nav-center a {
-    font-size: 15px;
-  }
-
-  .hero-title {
-    font-size: 32px;
-  }
-
-  .hero-date {
-    font-size: 18px;
-  }
-
-  .hero-logo {
-    max-width: 150px;
-  }
-
-  th, td {
-    padding: 10px 6px;
+  .admin-table .mat-mdc-cell,
+  .admin-table .mat-mdc-header-cell {
     font-size: 14px;
+    padding: 8px 4px;
   }
 
-  button {
+  button, .mat-raised-button {
     font-size: 14px;
     padding: 6px 12px;
   }
 }
 
-/* ==== MEDIA QUERY 480px ==== */
 @media (max-width: 480px) {
-  .nav-center {
-    gap: 5px;
-  }
+  .nav-center { gap: 5px; }
 
-  .nav-center a {
-    font-size: 14px;
-    padding: 6px 12px;
-  }
-
-  .hero-title {
-    font-size: 24px;
-  }
-
-  .hero-date {
-    font-size: 16px;
-  }
-
-  .hero-logo {
-    max-width: 120px;
-  }
-
-  th, td {
-    padding: 8px 4px;
+  .admin-table .mat-mdc-cell,
+  .admin-table .mat-mdc-header-cell {
     font-size: 12px;
+    padding: 6px 2px;
   }
 
-  button {
+  button, .mat-raised-button {
     font-size: 13px;
     padding: 5px 10px;
   }
 }
-

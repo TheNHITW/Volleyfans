@@ -5,11 +5,10 @@ interface Player {
   name: string;
   gender: string;
 }
-
 interface Team {
   teamName: string;
-  phone: string;
-  players: Player[];
+  phone?: string;
+  players?: Player[];
 }
 
 @Component({
@@ -21,7 +20,17 @@ interface Team {
 export class Admin implements OnInit {
   teams: Team[] = [];
   selectedDate = '';
-  isRegistrationOpen = false;
+  isRegistrationOpen = true;
+
+  // colonne per mat-table (match con gli ng-container dell'HTML)
+  displayedColumns: string[] = [
+    'teamName', 'phone',
+    'p1Name','p1Gender',
+    'p2Name','p2Gender',
+    'p3Name','p3Gender',
+    'p4Name','p4Gender',
+    'actions'
+  ];
 
   readonly baseUrl = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
@@ -44,9 +53,9 @@ export class Admin implements OnInit {
   getRegistrationStatus() {
     this.http.get<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/config`)
       .subscribe({
-        next: res => this.isRegistrationOpen = res.isRegistrationOpen,
+        next: res => this.isRegistrationOpen = !!res?.isRegistrationOpen,
         error: () => {
-          alert('Errore nel recuperare lo stato delle iscrizioni.');
+          console.error('Errore stato iscrizioni');
           this.isRegistrationOpen = false;
         }
       });
@@ -55,24 +64,54 @@ export class Admin implements OnInit {
   loadTeams(date: string) {
     this.http.get<Team[]>(`${this.baseUrl}/admin/registrations?date=${date}`)
       .subscribe({
-        next: data => this.teams = data,
+        next: data => {
+          // normalizza: sempre array, sempre 4 slot giocatori
+          this.teams = (data ?? []).map(t => {
+            const players = (t.players ?? []).slice(0, 4);
+            while (players.length < 4) players.push({ name: '—', gender: '—' });
+            return { ...t, players };
+          });
+        },
         error: err => {
           console.error('Errore nel caricamento:', err);
-          alert('Errore nel recuperare le iscrizioni.');
+          this.teams = [];
         }
       });
   }
 
+  // accesso sicuro per l’HTML
+  getPlayer(team: Team, idx: number, key: 'name' | 'gender'): string {
+    return team?.players?.[idx]?.[key] ?? '—';
+  }
+
   exportToCSV() {
-    if (this.teams.length === 0) {
+    if (!this.teams?.length) {
       alert('Nessuna iscrizione trovata per questa data.');
       return;
     }
 
-    const header = 'Nome Squadra,Telefono,Giocatore 1,Sesso 1,Giocatore 2,Sesso 2,Giocatore 3,Sesso 3,Giocatore 4,Sesso 4\n';
+    const header = [
+      'Nome Squadra','Telefono',
+      'Giocatore 1','Sesso 1',
+      'Giocatore 2','Sesso 2',
+      'Giocatore 3','Sesso 3',
+      'Giocatore 4','Sesso 4'
+    ].join(',') + '\n';
+
+    const safe = (v: string | undefined) =>
+      (v ?? '').toString().replace(/"/g, '""'); // escape "
+
     const rows = this.teams.map(team => {
-      const players = team.players.map(p => `${p.name},${p.gender}`).join(',');
-      return `${team.teamName},${team.phone},${players}`;
+      const p = team.players ?? [];
+      const cells = [
+        team.teamName ?? '',
+        team.phone ?? '',
+        p[0]?.name ?? '', p[0]?.gender ?? '',
+        p[1]?.name ?? '', p[1]?.gender ?? '',
+        p[2]?.name ?? '', p[2]?.gender ?? '',
+        p[3]?.name ?? '', p[3]?.gender ?? ''
+      ].map(safe).map(v => `"${v}"`);
+      return cells.join(',');
     }).join('\n');
 
     const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
@@ -85,7 +124,7 @@ export class Admin implements OnInit {
   toggleRegistration() {
     this.http.post<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/admin/toggle-registration`, {})
       .subscribe({
-        next: res => this.isRegistrationOpen = res.isRegistrationOpen,
+        next: res => this.isRegistrationOpen = !!res?.isRegistrationOpen,
         error: () => alert('Errore nel cambiare lo stato delle iscrizioni.')
       });
   }

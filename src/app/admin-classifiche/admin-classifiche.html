@@ -1,138 +1,302 @@
 <h2>Gestione Classifiche Torneo</h2>
+<div class="page">
 
-<!-- 🔹 Selezione opzioni -->
-<div style="margin-bottom: 1.5rem;">
-  <label for="eventDate">Data torneo:</label>
-  <select id="eventDate" [(ngModel)]="selectedDate" (change)="onDateChange()">
-    <option *ngFor="let d of availableDates" [value]="d">{{ d }}</option>
-  </select>
+  <!-- 🔹 Selezione opzioni -->
+  <mat-card class="card-section">
+    <div class="form-row">
+      <mat-form-field appearance="fill">
+        <mat-label>Data torneo</mat-label>
+        <mat-select [(value)]="selectedDate" (selectionChange)="onDateChange()">
+          <mat-option *ngFor="let d of availableDates" [value]="d">{{ d }}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-  <label for="teamCount" style="margin-left: 1rem;">Numero squadre:</label>
-  <select [(ngModel)]="selectedTeamCount" (change)="onTeamCountChange()">
-    <option *ngFor="let count of [12,13,14,15,16]" [ngValue]="count">{{ count }}</option>
-  </select>
-</div>
+      <mat-form-field appearance="fill">
+        <mat-label>Numero squadre</mat-label>
+        <mat-select [(value)]="selectedTeamCount" (selectionChange)="onTeamCountChange()">
+          <mat-option *ngFor="let count of [12,13,14,15,16]" [value]="count">{{ count }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-card>
 
-<!-- 🔹 Formula suggerita -->
-<div *ngIf="strutturaGironiSuggerita">
-  <h4>Formula di gara suggerita:</h4>
-  <ul>
-    <li *ngFor="let girone of gironiLettere">
-      Girone {{ girone }}: {{ strutturaGironiSuggerita[girone] || 0 }} squadre
-    </li>
-  </ul>
-  <button (click)="assegnaGironiAutomaticamente()">Assegna gironi automaticamente</button>
-</div>
+  <!-- 🔹 Formula suggerita -->
+  <mat-card *ngIf="strutturaGironiSuggerita" class="card-section">
+    <h4>Formula di gara suggerita:</h4>
+    <mat-list>
+      <mat-list-item *ngFor="let girone of gironiLettere">
+        Girone {{ girone }}: {{ strutturaGironiSuggerita[girone] || 0 }} squadre
+      </mat-list-item>
+    </mat-list>
+    <div class="admin-buttons">
+    <button mat-raised-button class="btn-orange" (click)="assegnaGironiAutomaticamente()">
+      Assegna gironi automaticamente
+    </button>
+    </div>
+  </mat-card>
 
-<!-- 🔹 Squadre selezionate -->
-<h3>Squadre selezionate ({{ filteredTeams.length }})</h3>
-<ul>
-  <li *ngFor="let team of filteredTeams">{{ team.teamName }}</li>
-</ul>
+  <!-- 🔹 Squadre selezionate -->
+  <mat-card class="card-section">
+    <h3>Squadre selezionate ({{ filteredTeams.length }})</h3>
+    <mat-list>
+      <mat-list-item *ngFor="let team of filteredTeams">{{ team.teamName }}</mat-list-item>
+    </mat-list>
+  </mat-card>
 
-<!-- 🔹 Assegnazione gironi -->
-<h3>Assegna le squadre ai gironi</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Squadra</th>
-      <th>Girone</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let team of filteredTeams">
-      <td>{{ team.teamName }}</td>
-      <td>
-        <select [value]="assegnazioni[team.teamName] || ''"
-                (change)="handleSelectChange($event, team.teamName)">
-          <option value="">--</option>
-          <option *ngFor="let lettera of gironiLettere" [value]="lettera">Girone {{ lettera }}</option>
-        </select>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <!-- 🔹 Assegnazione gironi -->
+  <mat-card class="card-section">
+    <h3>Assegna le squadre ai gironi</h3>
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="filteredTeams" class="mat-elevation-z8 full-width">
 
-<!-- 🔹 Composizione gironi -->
-<h3>Composizione Gironi</h3>
-<div class="gironi-grid">
-  <div class="girone-block" *ngFor="let lettera of gironiLettere">
-    <h4>Girone {{ lettera }}</h4>
-    <ul>
-      <li *ngFor="let team of gironi[lettera]">{{ team.teamName }}</li>
-    </ul>
-  </div>
-</div>
+        <!-- Nome squadra -->
+        <ng-container matColumnDef="teamName">
+          <th mat-header-cell *matHeaderCellDef>Squadra</th>
+          <td mat-cell *matCellDef="let team">{{ team.teamName }}</td>
+        </ng-container>
 
-<!-- 🔹 Genera match -->
-<button (click)="generaMatchGironi()">Calcola match gironi</button>
-
-<!-- 🔹 Calendario Match -->
-<div *ngIf="matchList.length > 0">
-  <h3>Calendario Match</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Girone</th>
-        <th>Team A</th>
-        <th>Team B</th>
-        <th>Arbitro</th>
-        <th>Campo</th>
-        <th>Round</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let match of matchList">
-        <td>{{ match.girone }}</td>
-        <td>{{ match.teamA }}</td>
-        <td>{{ match.teamB }}</td>
-        <td>{{ match.referee }}</td>
-        <td>{{ match.field }}</td>
-        <td>{{ match.round }}</td>
-      </tr>
-    </tbody>
-  </table>
-  <button (click)="generaPDF()">📄 Esporta in PDF</button>
-</div>
-
-<!-- 🔹 Matrice Risultati -->
-<h3>Matrice risultati - Tutti i Gironi</h3>
-
-<ng-container *ngFor="let girone of gironiLettere">
-  <div *ngIf="gironi[girone]?.length">
-    <h4>Girone {{ girone }}</h4>
-    <table class="matrice-risultati">
-      <thead>
-        <tr>
-          <th>Squadra</th>
-          <th *ngFor="let squadraCol of gironi[girone]">{{ squadraCol.teamName }}</th>
-          <th>Vittorie</th>
-          <th>Diff. Punti</th>
-          <th>Punti</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let squadraRow of gironi[girone]; let i = index">
-          <td>{{ squadraRow.teamName }}</td>
-          <td *ngFor="let squadraCol of gironi[girone]; let j = index">
-            <ng-container *ngIf="i !== j; else diagonale">
-              <input
-                type="text"
-                style="width: 40px; text-align: center;"
-                [value]="getDisplayValue(girone, squadraRow.teamName, squadraCol.teamName)"
-                (input)="aggiornaRisultatoConVittoria(girone, squadraRow.teamName, squadraCol.teamName, getInputValue($event))"
-              />
-            </ng-container>
-            <ng-template #diagonale>
-              <span style="font-size: 15px;">■</span>
-            </ng-template>
+        <!-- Girone -->
+        <ng-container matColumnDef="girone">
+          <th mat-header-cell *matHeaderCellDef>Girone</th>
+          <td mat-cell *matCellDef="let team">
+            <mat-form-field appearance="outline" class="small-select">
+              <mat-select [value]="assegnazioni[team.teamName] || ''"
+                          (selectionChange)="onAssignGirone(team.teamName, $event.value)">
+                <mat-option value="">--</mat-option>
+                <mat-option *ngFor="let lettera of gironiLettere" [value]="lettera">
+                  Girone {{ lettera }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </td>
-          <td>{{ calcolaVittorie(girone, squadraRow.teamName) }}</td>
-          <td>{{ calcolaDifferenzaPunti(girone, squadraRow.teamName) }}</td>
-          <td>{{ calcolaPuntiTotali(girone, squadraRow.teamName) }}</td>
-        </tr>
-      </tbody>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['teamName','girone']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['teamName','girone']"></tr>
+      </table>
+    </div>
+  </mat-card>
+
+  <!-- 🔹 Composizione gironi -->
+  <mat-card class="card-section">
+    <h3>Composizione Gironi</h3>
+    <div class="gironi-grid">
+      <mat-card *ngFor="let lettera of gironiLettere" class="girone-block">
+        <h4>Girone {{ lettera }}</h4>
+        <mat-list>
+          <mat-list-item *ngFor="let team of gironi[lettera]">{{ team.teamName }}</mat-list-item>
+        </mat-list>
+      </mat-card>
+    </div>
+  </mat-card>
+
+  <!-- 🔹 Bottone genera match -->
+  <div class="admin-buttons">
+    <button mat-raised-button class="btn-orange" (click)="generaMatchGironi()">
+      Calcola match gironi
+    </button>
+  </div>
+
+  <!-- 🔹 Calendario Match per Round -->
+  <mat-card class="card-section" *ngIf="matchList.length > 0">
+    <h3>Calendario Match</h3>
+
+    <ng-container *ngFor="let grp of getGroupedRounds()">
+      <h4>Round {{ grp.round }}</h4>
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="grp.matches" class="mat-elevation-z2 full-width">
+
+          <ng-container matColumnDef="girone">
+            <th mat-header-cell *matHeaderCellDef>Girone</th>
+            <td mat-cell *matCellDef="let m">{{ m.girone }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="teamA">
+            <th mat-header-cell *matHeaderCellDef>Team A</th>
+            <td mat-cell *matCellDef="let m">{{ m.teamA }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="teamB">
+            <th mat-header-cell *matHeaderCellDef>Team B</th>
+            <td mat-cell *matCellDef="let m">{{ m.teamB }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="referee">
+            <th mat-header-cell *matHeaderCellDef>Arbitro</th>
+            <td mat-cell *matCellDef="let m">{{ m.referee }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="field">
+            <th mat-header-cell *matHeaderCellDef>Campo</th>
+            <td mat-cell *matCellDef="let m">{{ m.field }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['girone','teamA','teamB','referee','field']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['girone','teamA','teamB','referee','field']"></tr>
+        </table>
+      </div>
+    </ng-container>
+  </mat-card>
+
+  <!-- 🔹 Matrice Risultati -->
+  <mat-card class="card-section">
+    <h3>Matrice risultati - Tutti i Gironi</h3>
+
+    <ng-container *ngFor="let girone of gironiLettere">
+      <div *ngIf="gironi[girone]?.length">
+        <h4>Girone {{ girone }}</h4>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="gironi[girone]" class="matrice-risultati mat-elevation-z8 full-width">
+
+            <!-- Indice -->
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef>#</th>
+              <td mat-cell *matCellDef="let row; let i=index">{{ i+1 }}</td>
+            </ng-container>
+
+            <!-- Nome squadra -->
+            <ng-container matColumnDef="teamName">
+              <th mat-header-cell *matHeaderCellDef>Squadra</th>
+              <td mat-cell *matCellDef="let row">{{ row.teamName }}</td>
+            </ng-container>
+
+            <!-- Colonne dinamiche -->
+            <ng-container *ngFor="let squadraCol of gironi[girone]; let j=index" [matColumnDef]="'vs'+j">
+              <th mat-header-cell *matHeaderCellDef>{{ j+1 }}</th>
+              <td mat-cell *matCellDef="let squadraRow; let i=index">
+                <ng-container *ngIf="i !== j; else diagonale">
+                  <input matInput class="score-input"
+                    [value]="getDisplayValue(girone, squadraRow.teamName, squadraCol.teamName)"
+                    (input)="aggiornaRisultatoConVittoria(girone, squadraRow.teamName, squadraCol.teamName, getInputValue($event))"/>
+                </ng-container>
+                <ng-template #diagonale>■</ng-template>
+              </td>
+            </ng-container>
+
+            <!-- Diff V/S -->
+            <ng-container matColumnDef="diffVS">
+              <th mat-header-cell *matHeaderCellDef>Diff V/S</th>
+              <td mat-cell *matCellDef="let row">{{ calcolaDiffVS(girone,row.teamName) }}</td>
+            </ng-container>
+
+            <!-- Punti totali -->
+            <ng-container matColumnDef="puntiTotali">
+              <th mat-header-cell *matHeaderCellDef>Punti totali</th>
+              <td mat-cell *matCellDef="let row">{{ calcolaPuntiTotali(girone,row.teamName) }}</td>
+            </ng-container>
+
+            <!-- Diff punti -->
+            <ng-container matColumnDef="diffPunti">
+              <th mat-header-cell *matHeaderCellDef>Diff. Punti</th>
+              <td mat-cell *matCellDef="let row">{{ calcolaDifferenzaPunti(girone,row.teamName) }}</td>
+            </ng-container>
+
+            <!-- righe -->
+            <tr mat-header-row *matHeaderRowDef="getColumnsForGirone(girone)"></tr>
+            <tr mat-row *matRowDef="let row; columns: getColumnsForGirone(girone)"></tr>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+  </mat-card>
+
+  <!-- 🔹 Classifiche finali -->
+  <mat-card class="card-section">
+    <h3>Classifiche finali (per girone)</h3>
+
+    <ng-container *ngFor="let girone of gironiLettere">
+      <div *ngIf="gironi[girone]?.length">
+        <h4>Girone {{ girone }}</h4>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="getClassificaGirone(girone)" class="mat-elevation-z8 full-width classifica-table responsive-table">
+
+            <ng-container matColumnDef="rank">
+              <th mat-header-cell *matHeaderCellDef>#</th>
+              <td mat-cell *matCellDef="let s; let i=index">{{ i+1 }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="team">
+              <th mat-header-cell *matHeaderCellDef>Squadra</th>
+              <td mat-cell *matCellDef="let s">{{ s.team }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="coeffVS">
+              <th mat-header-cell *matHeaderCellDef>Coeff V/S</th>
+              <td mat-cell *matCellDef="let s">{{ s.coeffVS | number:'1.2-2' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="puntiTotali">
+              <th mat-header-cell *matHeaderCellDef>Punti totali</th>
+              <td mat-cell *matCellDef="let s">{{ s.puntiTotali }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="diffPunti">
+              <th mat-header-cell *matHeaderCellDef>Diff. punti</th>
+              <td mat-cell *matCellDef="let s">{{ s.diffPunti }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['rank','team','coeffVS','puntiTotali','diffPunti']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['rank','team','coeffVS','puntiTotali','diffPunti']"></tr>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+  </mat-card>
+
+  <!-- 🔹 Classifica Generale -->
+<mat-card class="card-section">
+  <h3>Classifica Generale</h3>
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="getClassificaGenerale()" class="mat-elevation-z8 full-width classifica-table">
+
+      <!-- Rank -->
+      <ng-container matColumnDef="rank">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let s; let i = index">{{ i + 1 }}</td>
+      </ng-container>
+
+      <!-- Squadra -->
+      <ng-container matColumnDef="team">
+        <th mat-header-cell *matHeaderCellDef>Squadra</th>
+        <td mat-cell *matCellDef="let s">{{ s.team }}</td>
+      </ng-container>
+
+      <!-- Girone -->
+      <ng-container matColumnDef="girone">
+        <th mat-header-cell *matHeaderCellDef>Girone</th>
+        <td mat-cell *matCellDef="let s">{{ s.girone }}</td>
+      </ng-container>
+
+      <!-- Coeff VS -->
+      <ng-container matColumnDef="coeffVS">
+        <th mat-header-cell *matHeaderCellDef>Coeff V/S</th>
+        <td mat-cell *matCellDef="let s">{{ s.coeffVS | number:'1.2-2' }}</td>
+      </ng-container>
+
+      <!-- Punti totali -->
+      <ng-container matColumnDef="puntiTotali">
+        <th mat-header-cell *matHeaderCellDef>Punti totali</th>
+        <td mat-cell *matCellDef="let s">{{ s.puntiTotali }}</td>
+      </ng-container>
+
+      <!-- Diff Punti -->
+      <ng-container matColumnDef="diffPunti">
+        <th mat-header-cell *matHeaderCellDef>Diff. punti</th>
+        <td mat-cell *matCellDef="let s">{{ s.diffPunti }}</td>
+      </ng-container>
+
+      <!-- Righe -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsGenerale"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsGenerale"></tr>
     </table>
   </div>
-</ng-container>
-    <button (click)="generaPDFRisultati()">📄 Esporta risultati in PDF</button>
+</mat-card>
+
+  
+
+  <div class="admin-buttons">
+    <button mat-raised-button class="btn-blue" (click)="generaPDFRisultati()">
+      📄 Esporta risultati in PDF
+    </button>
+  </div>
+</div>
