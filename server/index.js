@@ -138,51 +138,50 @@ app.post('/admin/:date/matches', (req, res) => {
   res.json({ success: true, matches });
 });
 
-app.get('/admin/:date/matches', (req, res) => {
-  const { date } = req.params;
-  const data = readTournament(date);
-  res.json(data.matches || []);
-});
-
-// 🔥 SALVATAGGIO RISULTATO con orientamento a (match.teamA / match.teamB)
+// 🔥 SALVATAGGIO RISULTATO con ordine fisso (match.teamA / match.teamB)
 app.post('/admin/:date/result', (req, res) => {
   const { date } = req.params;
-  const { matchId, puntiA, puntiB, teamAName, teamBName } = req.body; // ← aggiunti opzionali
+  const { matchId, puntiA, puntiB } = req.body;
   const data = readTournament(date);
 
   const match = (data.matches || []).find(m => m.id === matchId);
-  if (!match) return res.status(404).json({ success: false, message: 'Match non trovato' });
-
-  // Se il client passa i nomi della cella, li usiamo per capire se invertire
-  let a = Number(puntiA);
-  let b = Number(puntiB);
-
-  const norm = s => (s || '').normalize('NFKC')
-    .replace(/[’‘`´]/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-
-  if (teamAName && teamBName) {
-    const sameOrder =
-      norm(teamAName) === norm(match.teamA) && norm(teamBName) === norm(match.teamB);
-    const reversedOrder =
-      norm(teamAName) === norm(match.teamB) && norm(teamBName) === norm(match.teamA);
-
-    if (reversedOrder) {
-      // 👈 lo user ha inserito i punti come (match.teamB vs match.teamA): swappo
-      const tmp = a; a = b; b = tmp;
-    }
-    // se non corrispondono, lascio com'è ma potrei anche rifiutare
+  if (!match) {
+    return res.status(404).json({ success: false, message: 'Match non trovato' });
   }
 
-  // Salva puntando SEMPRE all'ordine del match
-  match.score = { puntiA: a, puntiB: b };
-  data.results[matchId] = { teamA: match.teamA, teamB: match.teamB, puntiA: a, puntiB: b };
+  // Conversione sicura a numeri
+  const a = Number(puntiA);
+  const b = Number(puntiB);
 
+  // 📝 Debug log
+  console.log("📝 Salvataggio risultato", {
+    matchId,
+    teamA: match.teamA,
+    teamB: match.teamB,
+    puntiA: a,
+    puntiB: b
+  });
+
+  // Salva SEMPRE nello stesso ordine
+  match.score = { puntiA: a, puntiB: b };
+  data.results[matchId] = {
+    teamA: match.teamA,
+    teamB: match.teamB,
+    puntiA: a,
+    puntiB: b
+  };
+
+  // Aggiorna standings
   data.standings = computeStandings(data);
   writeTournament(date, data);
+
   res.json({ success: true, match, standings: data.standings });
+});
+
+
+app.get('/admin/:date/tournament', (req, res) => {
+  const { date } = req.params;
+  res.json(readTournament(date));
 });
 
 app.get('/admin/:date/standings', (req, res) => {
@@ -192,11 +191,6 @@ app.get('/admin/:date/standings', (req, res) => {
   data.standings = computeStandings(data);
   writeTournament(date, data);
   res.json(data.standings || {});
-});
-
-app.get('/admin/:date/tournament', (req, res) => {
-  const { date } = req.params;
-  res.json(readTournament(date));
 });
 
 // ================== LOGICA MATCH ================== //
@@ -281,100 +275,6 @@ function computeStandings(data) {
 // ✅ Avvio server
 app.listen(PORT, () => {
   console.log(`🚀 Backend + Frontend in ascolto su http://localhost:${PORT}`);
-});
-
-// ✅ Salva gironi
-app.post('/admin/:date/groups', (req, res) => {
-  const { date } = req.params;
-  const groups = req.body; // { A: [teamName,...], B:[...] }
-  const data = readTournament(date);
-  data.groups = groups;
-  writeTournament(date, data);
-  res.json({ success: true, groups });
-});
-
-// ✅ Genera calendario round-robin interleaved (max 4 campi)
-app.post('/admin/:date/matches', (req, res) => {
-  const { date } = req.params;
-  const data = readTournament(date);
-
-  const matches = generateMatchesForAllGroups(data.groups || {});
-  data.matches = matches;
-
-  writeTournament(date, data);
-  res.json({ success: true, matches });
-});
-
-function generateMatchesForAllGroups(groups) {
-  // 1. Genero match divisi per girone
-  const queues = {};
-  for (const g in groups) {
-    const teams = groups[g];
-    if (!teams || teams.length < 2) continue;
-
-    queues[g] = [];
-    for (let i = 0; i < teams.length; i++) {
-      for (let j = i + 1; j < teams.length; j++) {
-        const others = teams.filter(t => t !== teams[i] && t !== teams[j]);
-        queues[g].push({
-          id: `${g}-${i}-${j}`,
-          girone: g,
-          teamA: teams[i],
-          teamB: teams[j],
-          referee: others[0] || null,
-          field: null,
-          round: null
-        });
-      }
-    }
-  }
-
-  // 2. Interleaving round-based (1 match per girone per round, max 4 campi)
-  const scheduled = [];
-  let round = 1;
-
-  while (Object.values(queues).some(q => q.length > 0)) {
-    let field = 1;
-
-    for (const g of Object.keys(queues).sort()) {
-      if (queues[g].length > 0) {
-        const match = queues[g].shift(); // prendo il prossimo match del girone
-        match.round = round;
-        match.field = field++;
-        scheduled.push(match);
-      }
-    }
-
-    round++;
-  }
-
-  return scheduled;
-}
-
-
-// ✅ Inserisci risultato
-app.post('/admin/:date/result', (req, res) => {
-  const { date } = req.params;
-  const { matchId, puntiA, puntiB } = req.body;
-  const data = readTournament(date);
-
-  const match = data.matches.find(m => m.id === matchId);
-  if (!match) return res.status(404).json({ success: false, message: 'Match non trovato' });
-
-  match.score = { puntiA, puntiB };
-  data.results[matchId] = { teamA: match.teamA, teamB: match.teamB, puntiA, puntiB };
-
-  // ricalcola standings
-  data.standings = computeStandings(data);
-  writeTournament(date, data);
-  res.json({ success: true, match, standings: data.standings });
-});
-
-// ✅ Ritorna standings
-app.get('/admin/:date/standings', (req, res) => {
-  const { date } = req.params;
-  const data = readTournament(date);
-  res.json(data.standings || {});
 });
 
 // ✅ Campo suggerito per girone
