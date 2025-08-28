@@ -284,5 +284,27 @@
         "gender": "F"
       }
     ]
+  },
+  {
+    "teamName": "I (Dis)graziati",
+    "phone": "3349891547",
+    "players": [
+      {
+        "name": "Sarà bandiera",
+        "gender": "F"
+      },
+      {
+        "name": "Giuseppe Airò",
+        "gender": "M"
+      },
+      {
+        "name": "Sara Beraldi",
+        "gender": "F"
+      },
+      {
+        "name": "Andrea Di Giammarino",
+        "gender": "M"
+      }
+    ]
   }
 ]
