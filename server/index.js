@@ -6,24 +6,38 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Middleware
+// ================== MIDDLEWARE ================== //
 app.use(cors());
 app.use(express.json());
-
-// ✅ Serve Angular build statica
 app.use(express.static(path.join(__dirname, '../dist/volleyfans/browser')));
 
-// ✅ Funzione: restituisce path al file JSON per una data
-function getFilePathForDate(date) {
+// ================== UTILITY FILE ================== //
+function ensureDir() {
   const dir = path.join(__dirname, 'data');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  return path.join(dir, `registrations-${date}.json`);
+  return dir;
+}
+function getFilePathForDate(date) {
+  return path.join(ensureDir(), `registrations-${date}.json`);
+}
+function getTournamentFile(date) {
+  return path.join(ensureDir(), `tournament-${date}.json`);
+}
+function readTournament(date) {
+  const filePath = getTournamentFile(date);
+  if (!fs.existsSync(filePath)) {
+    return { date, groups: {}, matches: [], results: {}, standings: {} };
+  }
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+function writeTournament(date, data) {
+  fs.writeFileSync(getTournamentFile(date), JSON.stringify(data, null, 2));
 }
 
-// ✅ Rotta PING per UptimeRobot
+// ================== PING ================== //
 app.get('/ping', (req, res) => res.send('pong'));
 
-// ✅ REGISTRAZIONE squadra
+// ================== REGISTRAZIONI ================== //
 app.post('/register', (req, res) => {
   const newTeam = req.body;
   const dates = newTeam.selectedDates;
@@ -32,80 +46,54 @@ app.post('/register', (req, res) => {
     return res.status(400).json({ success: false, message: 'Nessuna data selezionata.' });
   }
 
-  console.log(`🏐 Nuova squadra: ${newTeam.teamName} per ${dates.join(', ')}`);
-
   dates.forEach(date => {
     const filePath = getFilePathForDate(date);
     const registrations = fs.existsSync(filePath)
-      ? JSON.parse(fs.readFileSync(filePath))
+      ? JSON.parse(fs.readFileSync(filePath, 'utf8'))
       : [];
-
     registrations.push(newTeam);
     fs.writeFileSync(filePath, JSON.stringify(registrations, null, 2));
-  }); 
+  });
+
   res.json({ success: true, message: 'Iscrizione registrata.' });
 });
 
-// ✅ RECUPERO iscrizioni per data
 app.get('/admin/registrations', (req, res) => {
   const date = req.query.date;
+  if (!date) return res.status(400).json({ success: false, message: 'Data mancante.' });
 
-  if (!date) {
-    return res.status(400).json({ success: false, message: 'Data mancante nella richiesta.' });
-  }
-
-  const filePath = path.join(__dirname, 'data', `registrations-${date}.json`);
-
-  if (!fs.existsSync(filePath)) {
-    return res.json([]); // file non ancora creato? restituiamo array vuoto
-  }
+  const filePath = getFilePathForDate(date);
+  if (!fs.existsSync(filePath)) return res.json([]);
 
   const registrations = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   res.json(registrations);
 });
 
-// ✅ ELIMINA squadra per data
 app.delete('/admin/registrations/:teamName', (req, res) => {
   const teamToDelete = decodeURIComponent(req.params.teamName).trim().toLowerCase();
   const date = req.query.date;
   if (!date) return res.status(400).json({ success: false, message: 'Parametro "date" mancante.' });
 
   const filePath = getFilePathForDate(date);
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ success: false, message: 'Nessun file per questa data.' });
-  }
+  if (!fs.existsSync(filePath)) return res.status(404).json({ success: false, message: 'Nessun file per questa data.' });
 
-  const registrations = JSON.parse(fs.readFileSync(filePath));
-  const updated = registrations.filter(
-    team => team.teamName.trim().toLowerCase() !== teamToDelete
-  );
-
-  if (updated.length === registrations.length) {
-    return res.status(404).json({ success: false, message: 'Squadra non trovata.' });
-  }
+  const registrations = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  const updated = registrations.filter(t => t.teamName.trim().toLowerCase() !== teamToDelete);
 
   fs.writeFileSync(filePath, JSON.stringify(updated, null, 2));
   res.json({ success: true, message: `Squadra eliminata per ${date}.` });
 });
 
-// ✅ CONFIG: stato iscrizioni
-const configFile = path.join(__dirname, 'data', 'config.json');
-
+// ================== CONFIG ================== //
+const configFile = path.join(ensureDir(), 'config.json');
 function getConfig() {
-  if (!fs.existsSync(configFile)) {
-    fs.writeFileSync(configFile, JSON.stringify({ isRegistrationOpen: true }, null, 2));
-  }
+  if (!fs.existsSync(configFile)) fs.writeFileSync(configFile, JSON.stringify({ isRegistrationOpen: true }, null, 2));
   return JSON.parse(fs.readFileSync(configFile, 'utf8'));
 }
-
 function setConfig(newConfig) {
   fs.writeFileSync(configFile, JSON.stringify(newConfig, null, 2));
 }
-
-app.get('/config', (req, res) => {
-  res.json(getConfig());
-});
-
+app.get('/config', (req, res) => res.json(getConfig()));
 app.post('/config/registration', (req, res) => {
   const { isRegistrationOpen } = req.body;
   const config = getConfig();
@@ -113,7 +101,6 @@ app.post('/config/registration', (req, res) => {
   setConfig(config);
   res.json({ success: true });
 });
-
 app.post('/admin/toggle-registration', (req, res) => {
   const config = getConfig();
   config.isRegistrationOpen = !config.isRegistrationOpen;
@@ -121,20 +108,341 @@ app.post('/admin/toggle-registration', (req, res) => {
   res.json({ success: true, isRegistrationOpen: config.isRegistrationOpen });
 });
 
-// Servizio dei file JSON per classifiche
-app.get('/registrations/:date', (req, res) => {
-  const date = req.params.date; // es. "2025-08-31"
-  const filename = `registrations-${date}.json`;
-  const filePath = path.join(__dirname, 'data', filename);
-
-  if (fs.existsSync(filePath)) {
-    res.sendFile(filePath);
-  } else {
-    res.status(404).json({ error: `File ${filename} non trovato.` });
-  }
+// ================== APERIVOLLEY ================== //
+app.post('/aperivolley', (req, res) => {
+  const partecipante = req.body;
+  const filePath = path.join(ensureDir(), 'aperivolley.json');
+  const esistenti = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath)) : [];
+  esistenti.push(partecipante);
+  fs.writeFileSync(filePath, JSON.stringify(esistenti, null, 2));
+  res.json({ success: true });
 });
+
+// ================== GESTIONE TORNEO ================== //
+app.post('/admin/:date/groups', (req, res) => {
+  const { date } = req.params;
+  const groups = req.body;
+  const data = readTournament(date);
+  data.groups = groups;
+  writeTournament(date, data);
+  res.json({ success: true, groups });
+});
+
+app.post('/admin/:date/matches', (req, res) => {
+  const { date } = req.params;
+  const data = readTournament(date);
+  const matches = generateMatchesForAllGroups(data.groups || {});
+  data.matches = matches;
+  writeTournament(date, data);
+  res.json({ success: true, matches });
+});
+
+app.get('/admin/:date/matches', (req, res) => {
+  const { date } = req.params;
+  const data = readTournament(date);
+  res.json(data.matches || []);
+});
+
+app.post('/admin/:date/result', (req, res) => {
+  const { date } = req.params;
+  const { matchId, puntiA, puntiB } = req.body;
+  const data = readTournament(date);
+
+  const match = (data.matches || []).find(m => m.id === matchId);
+  if (!match) return res.status(404).json({ success: false, message: 'Match non trovato' });
+
+  match.score = { puntiA, puntiB };
+  data.results[matchId] = { teamA: match.teamA, teamB: match.teamB, puntiA, puntiB };
+
+  data.standings = computeStandings(data);
+  writeTournament(date, data);
+  res.json({ success: true, match, standings: data.standings });
+});
+
+app.get('/admin/:date/standings', (req, res) => {
+  const { date } = req.params;
+  const data = readTournament(date);
+  data.standings = computeStandings(data);
+  writeTournament(date, data);
+  res.json(data.standings || {});
+});
+
+app.get('/admin/:date/tournament', (req, res) => {
+  const { date } = req.params;
+  res.json(readTournament(date));
+});
+
+// ================== LOGICA MATCH ================== //
+function generateMatchesForAllGroups(groups) {
+  // 1. Genero match divisi per girone
+  const queues = {};
+  for (const g in groups) {
+    const teams = groups[g];
+    if (!teams || teams.length < 2) continue;
+
+    queues[g] = [];
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        const others = teams.filter(t => t !== teams[i] && t !== teams[j]);
+        queues[g].push({
+          id: `${g}-${i}-${j}`,
+          girone: g,
+          teamA: teams[i],
+          teamB: teams[j],
+          referee: others[0] || null,
+          field: null,
+          round: null
+        });
+      }
+    }
+  }
+
+  // 2. Interleaving round-based
+  const scheduled = [];
+  let round = 1;
+
+  while (Object.values(queues).some(q => q.length > 0)) {
+    let field = 1;
+
+    for (const g of Object.keys(queues).sort()) {
+      if (queues[g].length > 0) {
+        const match = queues[g].shift(); // prendi il prossimo match del girone
+        match.round = round;
+        match.field = field++;
+        scheduled.push(match);
+      }
+    }
+
+    round++;
+  }
+
+  return scheduled;
+}
+
+// ================== STANDINGS ================== //
+function computeStandings(data) {
+  const standings = {};
+  for (const g in data.groups) {
+    standings[g] = data.groups[g].map(team => ({
+      team,
+      wins: 0, pf: 0, pa: 0, diff: 0, points: 0
+    }));
+  }
+
+  const lookup = {};
+  for (const g in standings) {
+    standings[g].forEach(r => (lookup[`${g}:${r.team}`] = r));
+  }
+
+  for (const m of data.matches) {
+    if (!m.score) continue;
+    const { puntiA, puntiB } = m.score;
+    const rowA = lookup[`${m.girone}:${m.teamA}`];
+    const rowB = lookup[`${m.girone}:${m.teamB}`];
+
+    rowA.pf += puntiA; rowA.pa += puntiB;
+    rowB.pf += puntiB; rowB.pa += puntiA;
+
+    if (puntiA > puntiB) { rowA.wins++; rowA.points += 3; }
+    else if (puntiB > puntiA) { rowB.wins++; rowB.points += 3; }
+  }
+
+  for (const g in standings) {
+    standings[g].forEach(r => r.diff = r.pf - r.pa);
+    standings[g].sort((a, b) => b.wins - a.wins || b.diff - a.diff || b.pf - a.pf);
+  }
+
+  return standings;
+}
 
 // ✅ Avvio server
 app.listen(PORT, () => {
   console.log(`🚀 Backend + Frontend in ascolto su http://localhost:${PORT}`);
 });
+
+// ✅ Utility torneo
+function getTournamentFile(date) {
+  const dir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return path.join(dir, `tournament-${date}.json`);
+}
+
+function readTournament(date) {
+  const filePath = getTournamentFile(date);
+  if (!fs.existsSync(filePath)) {
+    return { date, groups: {}, matches: [], results: {}, standings: {} };
+  }
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function writeTournament(date, data) {
+  fs.writeFileSync(getTournamentFile(date), JSON.stringify(data, null, 2));
+}
+
+// ✅ Salva gironi
+app.post('/admin/:date/groups', (req, res) => {
+  const { date } = req.params;
+  const groups = req.body; // { A: [teamName,...], B:[...] }
+  const data = readTournament(date);
+  data.groups = groups;
+  writeTournament(date, data);
+  res.json({ success: true, groups });
+});
+
+// ✅ Genera calendario round-robin interleaved (max 4 campi)
+app.post('/admin/:date/matches', (req, res) => {
+  const { date } = req.params;
+  const data = readTournament(date);
+
+  const matches = generateMatchesForAllGroups(data.groups || {});
+  data.matches = matches;
+
+  writeTournament(date, data);
+  res.json({ success: true, matches });
+});
+
+function generateMatchesForAllGroups(groups) {
+  // 1. Genero match divisi per girone
+  const queues = {};
+  for (const g in groups) {
+    const teams = groups[g];
+    if (!teams || teams.length < 2) continue;
+
+    queues[g] = [];
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        const others = teams.filter(t => t !== teams[i] && t !== teams[j]);
+        queues[g].push({
+          id: `${g}-${i}-${j}`,
+          girone: g,
+          teamA: teams[i],
+          teamB: teams[j],
+          referee: others[0] || null,
+          field: null,
+          round: null
+        });
+      }
+    }
+  }
+
+  // 2. Interleaving round-based (1 match per girone per round, max 4 campi)
+  const scheduled = [];
+  let round = 1;
+
+  while (Object.values(queues).some(q => q.length > 0)) {
+    let field = 1;
+
+    for (const g of Object.keys(queues).sort()) {
+      if (queues[g].length > 0) {
+        const match = queues[g].shift(); // prendo il prossimo match del girone
+        match.round = round;
+        match.field = field++;
+        scheduled.push(match);
+      }
+    }
+
+    round++;
+  }
+
+  return scheduled;
+}
+
+
+// ✅ Inserisci risultato
+app.post('/admin/:date/result', (req, res) => {
+  const { date } = req.params;
+  const { matchId, puntiA, puntiB } = req.body;
+  const data = readTournament(date);
+
+  const match = data.matches.find(m => m.id === matchId);
+  if (!match) return res.status(404).json({ success: false, message: 'Match non trovato' });
+
+  match.score = { puntiA, puntiB };
+  data.results[matchId] = { teamA: match.teamA, teamB: match.teamB, puntiA, puntiB };
+
+  // ricalcola standings
+  data.standings = computeStandings(data);
+  writeTournament(date, data);
+  res.json({ success: true, match, standings: data.standings });
+});
+
+// ✅ Ritorna standings
+app.get('/admin/:date/standings', (req, res) => {
+  const { date } = req.params;
+  const data = readTournament(date);
+  res.json(data.standings || {});
+});
+
+// Funzione calcolo standings
+function computeStandings(data) {
+  const standings = {};
+  for (const g in data.groups) {
+    standings[g] = data.groups[g].map(team => ({
+      team,
+      wins: 0, pf: 0, pa: 0, diff: 0, points: 0
+    }));
+  }
+
+  const lookup = {};
+  for (const g in standings) {
+    standings[g].forEach((row, i) => lookup[`${g}:${row.team}`] = row);
+  }
+
+  for (const m of data.matches) {
+    if (!m.score) continue;
+    const { puntiA, puntiB } = m.score;
+    const rowA = lookup[`${m.girone}:${m.teamA}`];
+    const rowB = lookup[`${m.girone}:${m.teamB}`];
+
+    rowA.pf += puntiA; rowA.pa += puntiB;
+    rowB.pf += puntiB; rowB.pa += puntiA;
+
+    if (puntiA > puntiB) { rowA.wins++; rowA.points += 3; }
+    else if (puntiB > puntiA) { rowB.wins++; rowB.points += 3; }
+  }
+
+  for (const g in standings) {
+    standings[g].forEach(r => r.diff = r.pf - r.pa);
+    standings[g].sort((a,b) => b.wins - a.wins || b.diff - a.diff || b.pf - a.pf);
+  }
+
+  return standings;
+}
+
+// ✅ Campo suggerito per girone
+function fieldForGirone(g) {
+  const mapping = { A:1, B:2, C:3, D:4 };
+  return mapping[g] || null;
+}
+
+// ✅ Generazione match per un girone
+function scheduleGroupMatches(girone, teams, startRound) {
+  const list = [];
+  let round = startRound;
+
+  // Caso 3 squadre: 3 partite, arbitra chi riposa
+  if (teams.length === 3) {
+    list.push({ id:`${girone}-0-1`, girone, teamA:teams[0], teamB:teams[1], referee:teams[2], field:fieldForGirone(girone), round: round++ });
+    list.push({ id:`${girone}-0-2`, girone, teamA:teams[0], teamB:teams[2], referee:teams[1], field:fieldForGirone(girone), round: round++ });
+    list.push({ id:`${girone}-1-2`, girone, teamA:teams[1], teamB:teams[2], referee:teams[0], field:fieldForGirone(girone), round: round++ });
+    return { matches:list, nextRound: round };
+  }
+
+  // Caso 4 (o più) squadre: tutte le coppie; referee = uno degli altri a rotazione
+  for (let i = 0; i < teams.length; i++) {
+    for (let j = i + 1; j < teams.length; j++) {
+      const others = teams.filter(t => t !== teams[i] && t !== teams[j]);
+      const referee = others[0] || null; // semplice rotazione
+      list.push({
+        id: `${girone}-${i}-${j}`,
+        girone,
+        teamA: teams[i],
+        teamB: teams[j],
+        referee,
+        field: fieldForGirone(girone),
+        round: round++
+      });
+    }
+  }
+  return { matches:list, nextRound: round };
+}

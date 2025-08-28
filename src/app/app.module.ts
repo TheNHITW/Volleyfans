@@ -1,9 +1,9 @@
-import { NgModule, Component } from '@angular/core';
+import { NgModule, Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http'; // ✅ Importa HttpClientModule
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
 
 import { routes } from './app.routes';
 
@@ -14,12 +14,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table'; 
+import { MatListModule } from '@angular/material/list';   
 
 import { Home } from './home/home';
 import { RegistrationForm } from './registration-form/registration-form';
 import { Admin } from './admin/admin';
 import { LoginComponent } from './login';
 import { AdminClassificheComponent } from './admin-classifiche/admin-classifiche';
+import { IscrivitiHome } from './iscriviti-home/iscriviti-home';
+import { AperivolleyForm } from './aperivolley-form/aperivolley-form';
 
 @Component({
   selector: 'app-root',
@@ -27,8 +31,7 @@ import { AdminClassificheComponent } from './admin-classifiche/admin-classifiche
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
-export class AppComponent { }
-
+export class AppComponent {}
 
 @NgModule({
   declarations: [
@@ -37,23 +40,28 @@ export class AppComponent { }
     RegistrationForm,
     Admin,
     LoginComponent,
-    AdminClassificheComponent
+    AdminClassificheComponent,
+    IscrivitiHome,
+    AperivolleyForm
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule, 
     RouterModule.forRoot(routes),
     ReactiveFormsModule,
     FormsModule,
-    HttpClientModule, // ✅ Inserito
+    HttpClientModule,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatInputModule,
     MatSelectModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatTableModule,  
+    MatListModule    
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

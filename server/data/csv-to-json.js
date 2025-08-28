@@ -3,7 +3,7 @@ const path = require('path');
 
 // Percorsi file
 const inputCsvPath = path.join(__dirname, 'registrations.csv');
-const outputJsonPath = path.join(__dirname, 'registrations.json');
+const outputJsonPath = path.join(__dirname, 'registrations-new.json');
 
 // Leggi CSV
 const csv = fs.readFileSync(inputCsvPath, 'utf-8');
