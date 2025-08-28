@@ -1,0 +1,34 @@
+<main class="register-page">
+  <div class="register-container">
+    <img class="register-logo" src="logo.png" alt="Logo Torneo">
+    <h1>Iscriviti all'Aperivolley</h1>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!isSubmitted">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Nome e Cognome</mat-label>
+        <input matInput formControlName="fullName" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Con quante persone verrai all'Aperivolley?</mat-label>
+        <input matInput formControlName="age" type="number" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Numero di telefono</mat-label>
+        <input matInput formControlName="phone" required>
+      </mat-form-field>
+
+      <mat-checkbox formControlName="privacyConsent" class="privacy-check">
+        Dichiaro di aver letto e accettato
+        <a href="assets/privacy.pdf" target="_blank" rel="noopener noreferrer">l’informativa sulla privacy</a>.
+      </mat-checkbox>
+
+      <button mat-raised-button type="submit" [disabled]="form.invalid">Invia iscrizione</button>
+    </form>
+
+    <p *ngIf="isSubmitted" style="text-align:center; color:green;">
+      ✅ Iscrizione inviata con successo!
+    </p>
+  </div>
+</main>

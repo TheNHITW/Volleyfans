@@ -6,6 +6,7 @@
   align-items: center;
   min-height: calc(100vh - 80px); /* altezza schermo meno navbar */
   padding-top: 80px; /* uguale all’altezza navbar */
+  padding-bottom: 5vh;
   text-align: center;
   padding-left: 20px;
   padding-right: 20px;

@@ -1,0 +1,33 @@
+.iscriviti-home {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(
+    rgb(255, 81, 0),
+    rgba(0, 0, 0, 0.5)
+  ),
+  url('https://source.unsplash.com/1600x900/?beach,volleyball') center/cover no-repeat;
+    color: #040442;
+}
+
+.scelte-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  padding-top: 100px;
+}
+
+.scelta-card {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f9f9f9;
+}
+
+.scelta-card:hover {
+  background-color: #e0f7fa;
+  transform: scale(1.02);
+}

@@ -1,0 +1,71 @@
+/* Layout generale */
+.register-page {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px); /* altezza schermo meno navbar */
+  padding-top: 100px; /* uguale all’altezza navbar */
+  background: linear-gradient(to bottom right, #fff3e0, #ffe0b2);
+  min-height: 100vh;
+}
+
+.register-container {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 75vh;
+  box-sizing: border-box;
+}
+
+/* Logo */
+.register-logo {
+    
+  max-width: 120px;
+  display: block;
+  margin: 0 auto 20px auto;
+}
+
+/* Titolo */
+h1 {
+  text-align: center;
+  color: #1a1f42;
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+/* Material form fields */
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Checkbox */
+.privacy-check {
+  display: block;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+/* Button */
+button[type="submit"] {
+  width: 100%;
+  background-color: #ff6600;
+  color: white;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #e25500;
+}
+
+button[disabled] {
+  background-color: rgba(255, 102, 0, 0.5);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
