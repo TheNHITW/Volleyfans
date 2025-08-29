@@ -306,5 +306,49 @@
         "gender": "M"
       }
     ]
+  },
+  {
+    "teamName": "Dov’è la Sangria?",
+    "phone": "3520261436",
+    "players": [
+      {
+        "name": "Ester Laura Romeo",
+        "gender": "F"
+      },
+      {
+        "name": "Camilla Pieriste",
+        "gender": "F"
+      },
+      {
+        "name": "Simone Siciliano",
+        "gender": "M"
+      },
+      {
+        "name": "Jacopo Maiolini",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "GREI",
+    "phone": "3662522815",
+    "players": [
+      {
+        "name": "Giada Genovese",
+        "gender": "F"
+      },
+      {
+        "name": "Riccardo Catani",
+        "gender": "M"
+      },
+      {
+        "name": "Ilaria Ingrosso",
+        "gender": "F"
+      },
+      {
+        "name": "Cristiano Lenzi",
+        "gender": "M"
+      }
+    ]
   }
 ]
