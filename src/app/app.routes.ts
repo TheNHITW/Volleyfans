@@ -7,8 +7,7 @@ import { LoginComponent } from './login';
 import { AdminClassificheComponent } from './admin-classifiche/admin-classifiche';
 import { IscrivitiHome } from './iscriviti-home/iscriviti-home';
 import { AperivolleyForm } from './aperivolley-form/aperivolley-form';
-
-
+import { RisultatiLiveComponent } from './risultati-live/risultati-live';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -18,4 +17,5 @@ export const routes: Routes = [
   { path: 'admin/classifiche', component: AdminClassificheComponent },
   { path: 'iscriviti', component: IscrivitiHome },
   { path: 'registrazione-aperivolley', component: AperivolleyForm },
+  { path: 'live', component: RisultatiLiveComponent }
 ];

@@ -24,6 +24,8 @@ import { LoginComponent } from './login';
 import { AdminClassificheComponent } from './admin-classifiche/admin-classifiche';
 import { IscrivitiHome } from './iscriviti-home/iscriviti-home';
 import { AperivolleyForm } from './aperivolley-form/aperivolley-form';
+import { RisultatiLiveComponent } from './risultati-live/risultati-live';
+
 
 @Component({
   selector: 'app-root',
@@ -42,7 +44,8 @@ export class AppComponent {}
     LoginComponent,
     AdminClassificheComponent,
     IscrivitiHome,
-    AperivolleyForm
+    AperivolleyForm,
+    RisultatiLiveComponent
   ],
   imports: [
     BrowserModule,

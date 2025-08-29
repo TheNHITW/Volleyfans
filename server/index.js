@@ -193,6 +193,121 @@ app.get('/admin/:date/standings', (req, res) => {
   res.json(data.standings || {});
 });
 
+// === PUBBLICO: stato live (sostituisci l'handler esistente) ===
+app.get('/public/:date/state', (req, res) => {
+  const date = req.params.date;
+
+  // usa la stessa sorgente dei percorsi admin
+  const data = readTournament(date); // { groups, matches, results, standings }
+
+  // se standings mancano o vuoi essere sicuro, ricalcola e salva
+  if (!data.standings || Object.keys(data.standings).length === 0) {
+    data.standings = computeStandings(data);
+    writeTournament(date, data);
+  }
+
+  // mappa MATCHES: da { score:{puntiA,puntiB} } a { scoreA, scoreB }
+  const matchesLive = (data.matches || []).map(m => ({
+    ...m,
+    scoreA: m.score?.puntiA ?? null,
+    scoreB: m.score?.puntiB ?? null,
+  }));
+
+  // calcola "giocate" per standings (quante partite con punteggio)
+  const played = new Map(); // key: `${girone}:${team}` -> count
+  for (const m of data.matches || []) {
+    if (!m?.score) continue;
+    const aKey = `${m.girone}:${m.teamA}`;
+    const bKey = `${m.girone}:${m.teamB}`;
+    played.set(aKey, (played.get(aKey) || 0) + 1);
+    played.set(bKey, (played.get(bKey) || 0) + 1);
+  }
+
+  // mappa STANDINGS: nel formato atteso dalla pagina live
+  const standingsLive = {};
+  for (const g of Object.keys(data.standings || {})) {
+    standingsLive[g] = (data.standings[g] || []).map(row => ({
+      teamName: row.team,
+      giocate: played.get(`${g}:${row.team}`) || 0,
+      vittorie: row.wins,
+      pf: row.pf,
+      ps: row.pa,
+      diff: row.diff,
+      pt: row.points,
+    }));
+  }
+
+  // opzionale: iscrizioni dal tuo archivio "data"
+  const regPath = getFilePathForDate(date);
+  const registrations = fs.existsSync(regPath)
+    ? JSON.parse(fs.readFileSync(regPath, 'utf8'))
+    : [];
+
+  res.json({
+    success: true,
+    data: {
+      registrations,
+      tournament: {
+        groups: data.groups || {},
+        matches: matchesLive,
+        standings: standingsLive,
+      }
+    }
+  });
+});
+
+// Tutti i client collegati a questa data riceveranno notifiche sugli aggiornamenti
+app.get('/public/:date/events', (req, res) => {
+  const date = req.params.date;
+
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+  });
+  res.flushHeaders && res.flushHeaders();
+
+  if (!sseClients.has(date)) sseClients.set(date, new Set());
+  sseClients.get(date).add(res);
+
+  req.on('close', () => {
+    sseClients.get(date)?.delete(res);
+  });
+});
+
+// body: { id?:string, girone?:string, teamA?:string, teamB?:string, scoreA:number, scoreB:number }
+app.post('/admin/:date/result', (req, res) => {
+  const date = req.params.date;
+  const { id, girone, teamA, teamB, scoreA, scoreB } = req.body || {};
+
+  const state = loadTournamentState(date);
+
+  // trova match per id o per (girone, teamA, teamB)
+  let m = null;
+  if (id) {
+    m = (state.matches || []).find(x => x.id === id);
+  } else if (girone && teamA && teamB) {
+    m = (state.matches || []).find(x =>
+      x.girone === girone &&
+      ((x.teamA === teamA && x.teamB === teamB) || (x.teamA === teamB && x.teamB === teamA))
+    );
+  }
+
+  if (!m) {
+    return res.status(404).json({ success:false, message:'Match non trovato.' });
+  }
+
+  m.scoreA = Number(scoreA);
+  m.scoreB = Number(scoreB);
+
+  // ricalcola standings
+  state.standings = computeStandings(state.groups, state.matches);
+
+  saveTournamentState(date, state); // scrive e notifica SSE
+  res.json({ success: true, data: { tournament: state } });
+});
+
+
 function generateMatchesForAllGroups(groups) {
   // --- NORMALIZZA nomi (gestisce sia string che {teamName}) ---
   const nameOf = (t) => (typeof t === 'string' ? t : (t && t.teamName) ? t.teamName : String(t));
@@ -626,6 +741,71 @@ function generateMatchesForAllGroups(groups) {
   return scheduled;
 }
 
+// ========= CALCOLO CLASSIFICHE =========
+function computeStandings(groups, matches) {
+  // init struttura
+  const standings = {};
+  for (const g of Object.keys(groups || {})) {
+    standings[g] = (groups[g] || []).map(team => ({
+      teamName: (typeof team === 'string') ? team : team?.teamName || String(team),
+      giocate: 0,
+      vittorie: 0,
+      perse: 0,
+      pf: 0,   // punti fatti
+      ps: 0,   // punti subiti
+      diff: 0, // pf - ps
+      pt: 0    // punti classifica (3 per vittoria)
+    }));
+  }
+
+  // index rapido per aggiornare
+  const idx = {};
+  for (const g of Object.keys(standings)) {
+    idx[g] = new Map(standings[g].map((r, i) => [r.teamName, i]));
+  }
+
+  // applica risultati
+  for (const m of matches || []) {
+    if (m?.girone == null || m?.teamA == null || m?.teamB == null) continue;
+    if (m?.scoreA == null || m?.scoreB == null) continue; // non giocata
+
+    const g = m.girone;
+    const a = m.teamA;
+    const b = m.teamB;
+
+    const ia = idx[g]?.get(a);
+    const ib = idx[g]?.get(b);
+    if (ia == null || ib == null) continue;
+
+    const ra = standings[g][ia];
+    const rb = standings[g][ib];
+
+    ra.giocate++; rb.giocate++;
+    ra.pf += Number(m.scoreA); ra.ps += Number(m.scoreB);
+    rb.pf += Number(m.scoreB); rb.ps += Number(m.scoreA);
+
+    if (m.scoreA > m.scoreB) {
+      ra.vittorie++; rb.perse++;
+      ra.pt += 3;
+    } else {
+      rb.vittorie++; ra.perse++;
+      rb.pt += 3;
+    }
+  }
+
+  // diff + sort
+  for (const g of Object.keys(standings)) {
+    for (const r of standings[g]) r.diff = r.pf - r.ps;
+    standings[g].sort((x, y) => {
+      if (y.vittorie !== x.vittorie) return y.vittorie - x.vittorie;
+      if (y.diff     !== x.diff)     return y.diff - x.diff;
+      if (y.pf       !== x.pf)       return y.pf - x.pf;
+      return String(x.teamName).localeCompare(String(y.teamName));
+    });
+  }
+
+  return standings;
+}
 
 function generateG4Rounds(group) {
   const [t1,t2,t3,t4] = group.teams;
