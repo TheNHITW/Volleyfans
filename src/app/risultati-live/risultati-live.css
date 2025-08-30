@@ -1,196 +1,185 @@
-/* ===== base (coerente con admin) ===== */
-.page { padding: 16px; }
-.card-section { margin: 16px 0; padding: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+/* ===== base ===== */
+html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
+.page { padding:16px; max-width:100%; min-height:100dvh; }
+.card-section { margin:16px 0; padding:16px; border-radius:16px; background:#f6f7fb; box-shadow:0 4px 10px rgba(0,0,0,0.08); overflow:hidden; }
 .muted { color:#666; }
-.table-wrapper { width:100%; overflow-x:auto; }
 
-.mat-mdc-header-cell,
-.mdc-data-table__header-cell { background:#ff6600 !important; color:#fff !important; font-weight:700; text-align:center; }
+/* scroll orizzontale SOLO dove lo decidi tu */
+.table-wrapper { width:100%; overflow:visible; }
+.x-scroll { overflow-x:auto; overflow-y:hidden; max-width:100vw; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
+.y-scroll { overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain; }
 
-/* classifica generale (material) */
-.classifica-table { table-layout: fixed; width:100%; }
-.classifica-table .mat-column-rank     { width: 6%;  }
-.classifica-table .mat-column-team     { width: 34%; }
-.classifica-table .mat-column-girone   { width: 10%; }
-.classifica-table .mat-column-giocate  { width: 6%;  }
-.classifica-table .mat-column-vittorie { width: 6%;  }
-.classifica-table .mat-column-pf       { width: 8%;  }
-.classifica-table .mat-column-ps       { width: 8%;  }
-.classifica-table .mat-column-diff     { width: 8%;  }
-.classifica-table .mat-column-pt       { width: 14%; }
-
-.mdc-data-table__cell, .mdc-data-table__header-cell,
-.mat-mdc-cell, .mat-mdc-header-cell {
-  text-align:center; padding:12px 8px;
-  border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;
+/* ===== Composizione Gironi ===== */
+.gironi-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+  gap:14px; margin-top:8px;
 }
-.mat-mdc-row .mat-mdc-cell:last-child,
-.mat-mdc-header-row .mat-mdc-header-cell:last-child { border-right:none; }
-.mat-mdc-row:nth-child(even) { background:#f9f9f9; }
-.mat-mdc-row:hover { background:#f1f1f1; }
-
-/* ===== matrice risultati ===== */
-.matrix-grid {
-  display: grid;
-  grid-template-columns: 1fr 360px; /* pannello "Risultati per round" più largo */
-  gap: 16px;
-  align-items: start;
+.girone-block {
+  background:#fff; border:1px solid #ececec; border-radius:12px; padding:12px 14px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.04);
 }
-@media (max-width: 920px) {
-  .matrix-grid { grid-template-columns: 1fr; }
-}
+.girone-block h4 { margin:0 0 8px; font-weight:700; color:#ff6600; }
+.girone-block mat-list { padding:0; margin:0; }
+.girone-block mat-list-item { display:block; padding:8px 0; border-bottom:1px dashed #efefef; line-height:1.35; }
+.girone-block mat-list-item:last-child { border-bottom:none; }
 
-.matrix-wrap h4,
-.rounds-wrap h4 { margin: 6px 0 10px; }
+/* ===== Matrice risultati ===== */
+.matrix-grid { display:grid; grid-template-columns:1fr 380px; gap:16px; align-items:start; }
+@media (max-width:920px){ .matrix-grid{ grid-template-columns:1fr; } }
+.matrix-wrap h4, .rounds-wrap h4 { margin:6px 0 10px; }
 
 .matrix-table {
-  width:100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  min-width: 700px;                 /* prima 740: tabella più snella */
-  border: 1px solid #e5e7eb;
+  width:100%; border-collapse:collapse; table-layout:fixed; min-width:700px;
+  border:1px solid #e5e7eb; background:#fff;
 }
 .matrix-table thead th {
-  position: sticky; top: 0; z-index: 2;
-  background:#ff6600; color:#fff; font-weight:700;
-  text-align:center; padding:7px 5px; white-space: nowrap;
+  position:sticky; top:0; z-index:2; background:#ff6600; color:#fff; font-weight:700;
+  text-align:center; padding:7px 5px; white-space:nowrap;
 }
+
+/* colonne lockate (restano visibili mentre scorri): # e Squadra */
 .matrix-table .corner {
-  position: sticky; left: 0; z-index: 3;
-  background:#ff6600; color:#fff; text-align:center;
-  width: 40px;
+  position:sticky; left:0; z-index:5; background:#ff6600; color:#fff; text-align:center; width:40px;
+  box-shadow: 1px 0 0 #e5e7eb;
 }
 .matrix-table .row-index {
-  position: sticky; left: 0; z-index: 2;
-  background:#fff4eb; color:#ff6600; text-align:center; width: 40px;
-  border-right:1px solid #e5e7eb;
+  position:sticky; left:0; z-index:4; background:#fff4eb; color:#ff6600; text-align:center; width:40px;
+  border-right:1px solid #e5e7eb; box-shadow: 1px 0 0 #e5e7eb;
 }
 .matrix-table .row-team-hd {
-  position: sticky; left: 40px; z-index: 3;
-  background:#ff6600; color:#fff; text-align:left; padding-left: 8px;
-  width: 220px;
+  position:sticky; left:40px; z-index:5; background:#ff6600; color:#fff; text-align:left; padding-left:8px;
+  width:220px; box-shadow: 1px 0 0 #e5e7eb;
 }
 .matrix-table .row-team {
-  position: sticky; left: 40px; z-index: 2;
-  background:#fff4eb; color:#ff6600; font-weight:600;
-  text-align:left; padding:6px 8px; white-space: nowrap;
-  border-right:1px solid #e5e7eb;
-  width: 220px; max-width: 220px;
-  overflow:hidden; text-overflow: ellipsis;
+  position:sticky; left:40px; z-index:4; background:#fff4eb; color:#ff6600; font-weight:600;
+  text-align:left; padding:6px 8px; white-space:nowrap; border-right:1px solid #e5e7eb;
+  width:220px; max-width:220px; overflow:hidden; text-overflow:ellipsis;
+  box-shadow: 1px 0 0 #e5e7eb;
 }
 
-/* celle risultato: leggermente più larghe ma compatte */
-.matrix-table thead .col-team { width: 46px; }  /* prima 44 */
+/* colonne scorrevoli (1..N + stats) */
+.matrix-table thead .col-team { width:46px; }
 .matrix-table td {
-  width: 46px;               /* +2px per leggere meglio 21–19 */
-  height: 34px;
-  text-align:center; vertical-align: middle;
-  padding:4px 3px;
-  font-size: 12.5px;
-  line-height: 1;
-  white-space: nowrap;
+  width:46px; height:34px; text-align:center; vertical-align:middle;
+  padding:4px 3px; font-size:12.5px; line-height:1; white-space:nowrap;
   border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;
 }
-.matrix-table td:last-child { border-right: none; }
+.matrix-table td:last-child { border-right:none; }
 
-/* risalto esito */
+/* esito */
 .matrix-table td.win  { background:#e9f7ef; font-weight:600; }
 .matrix-table td.loss { background:#fdeaea; color:#b00020; font-weight:600; }
 .matrix-table td.draw { background:#eef3ff; }
 .matrix-table td.empty{ color:#aaa; }
 .matrix-table td.diag { background:#f6f6f6; color:#bbb; }
 
-/* colonne di riepilogo a destra: più strette */
-.matrix-table .stat-hd {
-  background:#ff9b59;
-}
-.matrix-table .stat {
-  background:#fffdf7;
-  font-weight:600;
-  text-align:center;
-  padding:5px 4px; /* leggermente più compatte */
-}
-.matrix-table .stat.vs    { width: 64px; }   /* prima 80 */
-.matrix-table .stat.pf    { width: 72px; }   /* prima 100 */
-.matrix-table .stat.diff  { width: 72px; }   /* prima 100 */
-.matrix-table .stat .pos  { color:#0a7f3f; }
-.matrix-table .stat .neg  { color:#b00020; }
+/* riepilogo stretto */
+.matrix-table .stat-hd { background:#ff9b59; }
+.matrix-table .stat { background:#fffdf7; font-weight:600; text-align:center; padding:5px 4px; }
+.matrix-table .stat.vs   { width:62px; }
+.matrix-table .stat.pf   { width:68px; }
+.matrix-table .stat.diff { width:68px; }
+.matrix-table .stat .pos { color:#0a7f3f; }
+.matrix-table .stat .neg { color:#b00020; }
 
-/* pannello round a destra */
+/* ===== Risultati per round ===== */
 .rounds-wrap {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 12px;
-  background: #fff;
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px 16px;
+  box-shadow:0 1px 6px rgba(0,0,0,0.05); max-width:100%; overflow:visible; /* no più hidden */
 }
-.round-block { margin-bottom: 10px; }
-.round-title {
-  font-weight: 700; color:#ff6600; margin-bottom: 6px;
+.rounds-like-gironi .round-block { margin-bottom:10px; }
+.rounds-like-gironi .round-title { font-weight:800; color:#ff6600; margin-bottom:6px; }
+.rounds-like-gironi ul { list-style:none; padding:0; margin:0; }
+
+/* righe: Campo N non si schiaccia mai */
+.rounds-like-gironi li {
+  display:grid;
+  grid-template-columns: minmax(0,1fr) auto minmax(74px, max-content);
+  gap:6px;
+  padding:8px 0;
+  align-items:center;
+  border-bottom:1px dashed #efefef;
 }
-.rounds-wrap ul { list-style: none; padding: 0; margin: 0; }
-.rounds-wrap li {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 6px;
-  padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
+.rounds-like-gironi li:last-child { border-bottom:none; }
+
+.rounds-like-gironi .teams {
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.rounds-wrap li:last-child { border-bottom: none; }
-.rounds-wrap .teams  { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.rounds-wrap .score  { font-weight: 700; }
-.rounds-wrap .meta   { color: #666; }
-
-/* ===== Mobile tuning: Classifica Generale ===== */
-@media (max-width: 480px) {
-  /* la tabella può allargarsi e scorrere orizzontalmente senza stringere tutto */
-  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-  .classifica-table {
-    min-width: 520px;           /* evita caratteri troppo piccoli comprimendo le colonne */
-    table-layout: fixed;        /* stabilizza le larghezze */
-  }
-
-  /* font + padding più grandi solo per la classifica */
-  .classifica-table .mat-mdc-header-cell,
-  .classifica-table .mat-mdc-cell,
-  .classifica-table .mdc-data-table__header-cell,
-  .classifica-table .mdc-data-table__cell {
-    font-size: 14px;            /* prima ~13 */
-    line-height: 1.2;
-    padding: 10px 8px;          /* prima 12px 8px globali: qui un po’ più “arioso” */
-  }
-
-  /* colonna squadra leggibile e allineata a sinistra con ellissi */
-  .classifica-table .mat-column-team {
-    width: 40%;                 /* più spazio al nome */
-    text-align: left !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* bilanciamento colonne numeriche (un po’ più strette) */
-  .classifica-table .mat-column-rank,
-  .classifica-table .mat-column-giocate,
-  .classifica-table .mat-column-vittorie { width: 8%; }
-
-  .classifica-table .mat-column-pf,
-  .classifica-table .mat-column-ps,
-  .classifica-table .mat-column-diff,
-  .classifica-table .mat-column-pt { width: 12%; }
-
-  /* separazione visiva tra righe per non sembrare “attaccate” */
-  .mat-mdc-row:nth-child(even) { background:#fafafa; }
-  .mat-mdc-row { border-bottom: 1px solid #eee; }
+.rounds-like-gironi .score {
+  font-weight:800; justify-self:center;
+}
+.rounds-like-gironi .meta {
+  color:#666;
+  white-space:nowrap;
+  min-width:74px;     /* garantisce spazio per "Campo 10" */
+  width:fit-content;
+  text-align:right;
+  padding-left:2px;
+  justify-self:end;
 }
 
-/* tablet: piccolo boost di leggibilità */
-@media (min-width: 481px) and (max-width: 768px) {
-  .classifica-table .mat-mdc-header-cell,
-  .classifica-table .mat-mdc-cell {
-    font-size: 13.5px;
-    padding: 10px 8px;
-  }
-  .classifica-table { min-width: 560px; }
-  .classifica-table .mat-column-team { width: 36%; text-align: left !important; }
+/* ===== Classifica Generale ===== */
+.classifica-table { table-layout:fixed; width:100%; background:#fff; border:1px solid #e5e7eb; }
+.mdc-data-table__cell, .mdc-data-table__header-cell,
+.mat-mdc-cell, .mat-mdc-header-cell {
+  text-align:center; padding:12px 8px;
+  border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;
+}
+.mat-mdc-row .mat-mdc-cell:last-child, .mat-mdc-header-row .mat-mdc-header-cell:last-child { border-right:none; }
+.mat-mdc-row:nth-child(even){ background:#f9f9f9; }
+.mat-mdc-row:hover{ background:#f1f1f1; }
+
+/* sticky per prima (#) e seconda colonna (Squadra) anche nella classifica */
+.classifica-table .cls-sticky-idx {
+  position:sticky; left:0; z-index:3; background:#fff4eb; color:#ff6600; font-weight:700;
+  box-shadow:1px 0 0 #e5e7eb;
+}
+.classifica-table .cls-sticky-team {
+  position:sticky; left:48px; z-index:2; background:#fff; text-align:left !important;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:1px 0 0 #e5e7eb;
+}
+
+/* larghezze base classifica */
+.classifica-table .mat-column-rank     { width:48px; }
+.classifica-table .mat-column-team     { width:260px; }
+.classifica-table .mat-column-girone   { width:80px; }
+.classifica-table .mat-column-giocate  { width:64px; }
+.classifica-table .mat-column-vittorie { width:64px; }
+.classifica-table .mat-column-pf       { width:80px; }
+.classifica-table .mat-column-ps       { width:80px; }
+.classifica-table .mat-column-diff     { width:80px; }
+.classifica-table .mat-column-pt       { width:90px; }
+
+/* ===== Responsive ===== */
+@media (max-width:768px){
+  .matrix-table { min-width:640px; }
+  .matrix-table thead th, .matrix-table td { font-size:12.5px; }
+  .matrix-table thead .col-team, .matrix-table td { width:44px; }
+  .matrix-table .row-team-hd, .matrix-table .row-team { width:210px; max-width:210px; }
+  .matrix-table .stat.vs { width:58px; } .matrix-table .stat.pf, .matrix-table .stat.diff { width:64px; }
+  .rounds-like-gironi li { padding:6px 0; gap:6px; }
+}
+
+@media (max-width:480px){
+  .matrix-table { min-width:560px; }
+  .matrix-table thead th, .matrix-table td { font-size:12.5px; padding:6px 4px; }
+  .matrix-table .row-team-hd, .matrix-table .row-team { width:200px; max-width:200px; }
+  .matrix-table thead .col-team, .matrix-table td { width:42px; height:32px; }
+  .matrix-table .stat.vs { width:54px; } .matrix-table .stat.pf, .matrix-table .stat.diff { width:60px; }
+
+  .rounds-like-gironi .round-title { font-size:14px; }
+  .rounds-like-gironi li { padding:5px 0; gap:4px; }
+  .rounds-like-gironi .teams { font-size:12px; }
+  .rounds-like-gironi .score { font-size:13px; }
+  .rounds-like-gironi .meta  { font-size:12px; }
+  .classifica-table { min-width:560px; }
+  .classifica-table .mat-column-team { width:220px; }
+  .classifica-table .cls-sticky-team { left:48px; }
+}
+
+@media (max-width:360px){
+  .rounds-like-gironi .teams { font-size:12.5px; }
+  .rounds-like-gironi .score { font-size:12.5px; }
+  .rounds-like-gironi .meta  { font-size:11.5px; min-width:58px; }
+  .rounds-wrap { padding-right:18px; }
 }
