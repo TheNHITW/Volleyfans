@@ -1,12 +1,249 @@
 {
   "date": "2025-08-31",
   "groups": {
-    "A": [],
-    "B": [],
-    "C": [],
-    "D": []
+    "A": [
+      "C'è da spostare una panda",
+      "I (Dis)graziati",
+      "Se me la dai te l’appoggio",
+      "Squat Monopodalico"
+    ],
+    "B": [
+      "drinking team",
+      "Gli Sfaticati",
+      "GOTA",
+      "Il torneo è annullato"
+    ],
+    "C": [
+      "Dov’è la Sangria?",
+      "GREI",
+      "I colpi di sole",
+      "Trallallero trallallà"
+    ],
+    "D": [
+      "Fire Volley",
+      "Spiaggia libera",
+      "Supplì con panna",
+      "TELETUBBIES 2.0"
+    ]
   },
-  "matches": [],
+  "matches": [
+    {
+      "id": "A-0-3",
+      "girone": "A",
+      "teamA": "C'è da spostare una panda",
+      "teamB": "Squat Monopodalico",
+      "referee": "I (Dis)graziati",
+      "field": 1,
+      "round": 1
+    },
+    {
+      "id": "B-0-3",
+      "girone": "B",
+      "teamA": "drinking team",
+      "teamB": "Il torneo è annullato",
+      "referee": "GOTA",
+      "field": 2,
+      "round": 1
+    },
+    {
+      "id": "C-0-3",
+      "girone": "C",
+      "teamA": "Dov’è la Sangria?",
+      "teamB": "Trallallero trallallà",
+      "referee": "I colpi di sole",
+      "field": 3,
+      "round": 1
+    },
+    {
+      "id": "D-0-3",
+      "girone": "D",
+      "teamA": "Fire Volley",
+      "teamB": "TELETUBBIES 2.0",
+      "referee": "Supplì con panna",
+      "field": 4,
+      "round": 1
+    },
+    {
+      "id": "A-1-3",
+      "girone": "A",
+      "teamA": "Squat Monopodalico",
+      "teamB": "I (Dis)graziati",
+      "referee": "C'è da spostare una panda",
+      "field": 1,
+      "round": 2
+    },
+    {
+      "id": "B-1-2",
+      "girone": "B",
+      "teamA": "Gli Sfaticati",
+      "teamB": "GOTA",
+      "referee": "drinking team",
+      "field": 2,
+      "round": 2
+    },
+    {
+      "id": "C-1-2",
+      "girone": "C",
+      "teamA": "GREI",
+      "teamB": "I colpi di sole",
+      "referee": "Dov’è la Sangria?",
+      "field": 3,
+      "round": 2
+    },
+    {
+      "id": "D-1-2",
+      "girone": "D",
+      "teamA": "Spiaggia libera",
+      "teamB": "Supplì con panna",
+      "referee": "Fire Volley",
+      "field": 4,
+      "round": 2
+    },
+    {
+      "id": "A-0-1",
+      "girone": "A",
+      "teamA": "C'è da spostare una panda",
+      "teamB": "I (Dis)graziati",
+      "referee": "Squat Monopodalico",
+      "field": 1,
+      "round": 3
+    },
+    {
+      "id": "B-0-2",
+      "girone": "B",
+      "teamA": "drinking team",
+      "teamB": "GOTA",
+      "referee": "Gli Sfaticati",
+      "field": 2,
+      "round": 3
+    },
+    {
+      "id": "C-0-2",
+      "girone": "C",
+      "teamA": "Dov’è la Sangria?",
+      "teamB": "I colpi di sole",
+      "referee": "GREI",
+      "field": 3,
+      "round": 3
+    },
+    {
+      "id": "D-0-2",
+      "girone": "D",
+      "teamA": "Fire Volley",
+      "teamB": "Supplì con panna",
+      "referee": "Spiaggia libera",
+      "field": 4,
+      "round": 3
+    },
+    {
+      "id": "A-2-3",
+      "girone": "A",
+      "teamA": "Se me la dai te l’appoggio",
+      "teamB": "Squat Monopodalico",
+      "referee": "C'è da spostare una panda",
+      "field": 1,
+      "round": 4
+    },
+    {
+      "id": "B-1-3",
+      "girone": "B",
+      "teamA": "Il torneo è annullato",
+      "teamB": "Gli Sfaticati",
+      "referee": "drinking team",
+      "field": 2,
+      "round": 4
+    },
+    {
+      "id": "C-1-3",
+      "girone": "C",
+      "teamA": "Trallallero trallallà",
+      "teamB": "GREI",
+      "referee": "Dov’è la Sangria?",
+      "field": 3,
+      "round": 4
+    },
+    {
+      "id": "D-1-3",
+      "girone": "D",
+      "teamA": "TELETUBBIES 2.0",
+      "teamB": "Spiaggia libera",
+      "referee": "Fire Volley",
+      "field": 4,
+      "round": 4
+    },
+    {
+      "id": "A-1-2",
+      "girone": "A",
+      "teamA": "I (Dis)graziati",
+      "teamB": "Se me la dai te l’appoggio",
+      "referee": "Squat Monopodalico",
+      "field": 1,
+      "round": 5
+    },
+    {
+      "id": "B-0-1",
+      "girone": "B",
+      "teamA": "drinking team",
+      "teamB": "Gli Sfaticati",
+      "referee": "Il torneo è annullato",
+      "field": 2,
+      "round": 5
+    },
+    {
+      "id": "C-0-1",
+      "girone": "C",
+      "teamA": "Dov’è la Sangria?",
+      "teamB": "GREI",
+      "referee": "Trallallero trallallà",
+      "field": 3,
+      "round": 5
+    },
+    {
+      "id": "D-0-1",
+      "girone": "D",
+      "teamA": "Fire Volley",
+      "teamB": "Spiaggia libera",
+      "referee": "TELETUBBIES 2.0",
+      "field": 4,
+      "round": 5
+    },
+    {
+      "id": "A-0-2",
+      "girone": "A",
+      "teamA": "C'è da spostare una panda",
+      "teamB": "Se me la dai te l’appoggio",
+      "referee": "I (Dis)graziati",
+      "field": 1,
+      "round": 6
+    },
+    {
+      "id": "B-2-3",
+      "girone": "B",
+      "teamA": "GOTA",
+      "teamB": "Il torneo è annullato",
+      "referee": "Gli Sfaticati",
+      "field": 2,
+      "round": 6
+    },
+    {
+      "id": "C-2-3",
+      "girone": "C",
+      "teamA": "I colpi di sole",
+      "teamB": "Trallallero trallallà",
+      "referee": "GREI",
+      "field": 3,
+      "round": 6
+    },
+    {
+      "id": "D-2-3",
+      "girone": "D",
+      "teamA": "Supplì con panna",
+      "teamB": "TELETUBBIES 2.0",
+      "referee": "Spiaggia libera",
+      "field": 4,
+      "round": 6
+    }
+  ],
   "results": {},
   "standings": {}
 }
