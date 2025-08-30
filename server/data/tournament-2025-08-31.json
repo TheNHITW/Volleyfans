@@ -245,5 +245,53 @@
     }
   ],
   "results": {},
-  "standings": {}
+  "standings": {
+    "A": [
+      {
+        "team": "C'è da spostare una panda",
+        "wins": 0,
+        "pf": 0,
+        "pa": 0,
+        "diff": 0,
+        "points": 0
+      },
+      {
+        "team": "Se me la dai te l’appoggio",
+        "wins": 0,
+        "pf": 0,
+        "pa": 0,
+        "diff": 0,
+        "points": 0
+      }
+    ],
+    "B": [
+      {
+        "team": "Gli Sfaticati",
+        "wins": 0,
+        "pf": 0,
+        "pa": 0,
+        "diff": 0,
+        "points": 0
+      },
+      {
+        "team": "Il torneo è annullato",
+        "wins": 0,
+        "pf": 0,
+        "pa": 0,
+        "diff": 0,
+        "points": 0
+      }
+    ],
+    "C": [
+      {
+        "team": "Trallallero trallallà",
+        "wins": 0,
+        "pf": 0,
+        "pa": 0,
+        "diff": 0,
+        "points": 0
+      }
+    ],
+    "D": []
+  }
 }
