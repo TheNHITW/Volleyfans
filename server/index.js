@@ -312,6 +312,7 @@ function generateMatchesForAllGroups(groups) {
   // --- NORMALIZZA nomi (gestisce sia string che {teamName}) ---
   const nameOf = (t) => (typeof t === 'string' ? t : (t && t.teamName) ? t.teamName : String(t));
   const groupKeys = Object.keys(groups || {}).sort();
+  const LATE = { group: 'A', team: 'Se me la dai te l’appoggio', startRound: 4 }; // oppure null
 
   // Mappa "pura" solo con NOME squadra
   const pure = {};
@@ -556,6 +557,174 @@ function generateMatchesForAllGroups(groups) {
 
     return scheduled;
   }
+
+  // === SCENARIO 4: 4×G4 (16 squadre) — arbitri SOLO dal proprio girone
+  // Supporta 1 squadra "in ritardo", presente solo da un certo round (es. round 4).
+  // Campi fissi: A→1, B→2, C→3, D→4
+  if (g4Keys.length === 4 && g3Keys.length === 0 && FIELDS_PER_ROUND === 4) {
+
+    // opzionale: secondo parametro con { lateArrival: { group, team, startRound } }
+    const late = (typeof arguments[1] === 'object' && arguments[1] && arguments[1].lateArrival)
+      ? arguments[1].lateArrival
+      : (typeof LATE !== 'undefined' ? LATE : null);
+
+    const [gA, gB, gC, gD] = g4Keys; // ordinati
+    const groups4 = { [gA]: pure[gA].slice(), [gB]: pure[gB].slice(), [gC]: pure[gC].slice(), [gD]: pure[gD].slice() };
+
+    // Berger per ogni girone → 6 match
+    const perGroup = {}; // gKey -> { teams, matches:[{a,b,idle:[x,y]}] }
+    for (const gKey of [gA, gB, gC, gD]) {
+      const T = groups4[gKey]; // [t0,t1,t2,t3]
+      const blocks = berger4(T); // 3 blocchi x 2 partite
+
+      const matches = [];
+      for (let b = 0; b < 3; b++) {
+        for (let m = 0; m < 2; m++) {
+          const pair = blocks[b][m];                               // [p,q]
+          const idle = T.filter(x => x !== pair[0] && x !== pair[1]); // 2 che riposano
+          matches.push({ a: pair[0], b: pair[1], idle });
+        }
+      }
+
+      perGroup[gKey] = { teams: T, matches };
+    }
+
+    // Se esiste una squadra "late" in un girone da 4:
+    // - metti nei round 1–3 SOLO match che NON la coinvolgono
+    // - sposta tutti i match che la coinvolgono in round 4–6
+  function reorderForLate(gKey, teamName, startRound) {
+    const PG = perGroup[gKey];
+    if (!PG) return;
+
+    const tLate = teamName;
+    const early = [];
+    const lateM = [];
+
+    for (const m of PG.matches) {
+      const involvesLate = (m.a === tLate || m.b === tLate);
+      if (involvesLate) lateM.push(m); else early.push(m);
+    }
+
+    // servono 3 early e 3 late
+    if (early.length === 3 && lateM.length === 3 && startRound >= 4) {
+      // Squadre "presenti" (le 3 senza la late)
+      const T = PG.teams.filter(t => t !== tLate);
+
+      // Individua chi ha giocato R3 tra le presenti (sono i due team di early[2])
+      const r3Teams = new Set([early[2].a, early[2].b]);
+
+      // Scegli per il Round 4 la squadra che NON ha giocato il Round 3
+      const preferForR4 = T.find(t => !r3Teams.has(t)) || T[0];
+
+      // Trova il match "late" contro preferForR4
+      const idxFirstLate = lateM.findIndex(m => (m.a === tLate ? m.b : m.a) === preferForR4);
+      const firstLate = (idxFirstLate >= 0) ? lateM.splice(idxFirstLate, 1)[0] : lateM.shift();
+
+      // Ordine finale: 1..3 early, 4 il match "sicuro", poi gli altri due
+      PG.matches = [...early, firstLate, ...lateM];
+    }
+}
+
+
+    if (late && groups4[late.group]?.includes(late.team)) {
+      reorderForLate(late.group, late.team, Number(late.startRound) || 4);
+    }
+
+    // Assegnazione ARBITRI:
+    // - SOLO dal girone stesso
+    // - per i gironi SENZA "late": puntiamo al pattern 2–1–2–1 (come prima)
+    // - per il girone CON "late": scegliamo al volo in base a chi è disponibile al round
+    //   (la squadra in ritardo non può arbitrare prima di startRound)
+    const scheduled = [];
+    const perGroupRefCount = {}; // gKey -> Map(team->count)
+    const perGroupLastRef  = {}; // gKey -> last team
+
+    const availableAt = (gKey, team, round) => {
+      if (!late) return true;
+      if (late.group !== gKey) return true;
+      if (team !== late.team) return true;
+      // la squadra late non è disponibile come arbitro prima di startRound
+      return round >= (Number(late.startRound) || 4);
+    };
+
+    // Target 2–1–2–1 per i gironi senza "late" (offset = 0: T[0],T[2] hanno 2; T[1],T[3] hanno 1)
+    function targetFor(gKey) {
+      if (late && late.group === gKey) return null; // nessun target rigido
+      const T = perGroup[gKey].teams;
+      const target = new Map(T.map((t, i) => [t, (i % 2 === 0) ? 2 : 1]));
+      return target;
+    }
+
+    // Mappatura fissa campi
+    const orderByField = [gA, gB, gC, gD];
+
+    for (let r = 1; r <= 6; r++) {
+      for (let f = 0; f < 4; f++) {
+        const gKey = orderByField[f];
+        const PG = perGroup[gKey];
+        const T  = PG.teams;
+        const M  = PG.matches[r - 1]; // match del girone per questo round
+
+        // prepara contatori per girone
+        if (!perGroupRefCount[gKey]) perGroupRefCount[gKey] = new Map(T.map(t => [t, 0]));
+        const refCount = perGroupRefCount[gKey];
+        let lastRef = perGroupLastRef[gKey] || null;
+
+        // Idle del match → filtra per disponibilità al round
+        const idleAvail = M.idle.filter(t => availableAt(gKey, t, r));
+        // per normalità in 4×G4 idle sono 2; se uno è "late" nei primi 3 round, resterà 1 solo candidato.
+        if (idleAvail.length === 0) {
+          // estrema sicurezza: se nessuno disponibile, prendi comunque il primo idle "non disponibile"
+          idleAvail.push(M.idle[0]);
+        }
+
+        // Se abbiamo un target (girone senza late), privilegiamo chi è sotto target
+        const target = targetFor(gKey);
+
+        let pick = null;
+        if (target) {
+          // tra i candidati disponibili, scegli sotto-target; altrimenti il meno carico; evita back-to-back
+          const cand = idleAvail.slice().sort((a, b) => {
+            const aNeed = (refCount.get(a) || 0) - (target.get(a) || 0);
+            const bNeed = (refCount.get(b) || 0) - (target.get(b) || 0);
+            if (aNeed !== bNeed) return aNeed - bNeed; // più negativo = più sotto-target
+            const ra = refCount.get(a) || 0, rb = refCount.get(b) || 0;
+            if (ra !== rb) return ra - rb;
+            if (lastRef && (a === lastRef) !== (b === lastRef)) return (a === lastRef) ? 1 : -1;
+            return T.indexOf(a) - T.indexOf(b);
+          });
+          pick = cand[0];
+        } else {
+          // girone con late: scegli il meno carico; evita back-to-back
+          const cand = idleAvail.slice().sort((a, b) => {
+            const ra = refCount.get(a) || 0, rb = refCount.get(b) || 0;
+            if (ra !== rb) return ra - rb;
+            if (lastRef && (a === lastRef) !== (b === lastRef)) return (a === lastRef) ? 1 : -1;
+            return T.indexOf(a) - T.indexOf(b);
+          });
+          pick = cand[0];
+        }
+
+        // registra
+        refCount.set(pick, (refCount.get(pick) || 0) + 1);
+        perGroupLastRef[gKey] = pick;
+
+        scheduled.push({
+          id: idFor(gKey, M.a, M.b),
+          girone: gKey,
+          teamA: M.a,
+          teamB: M.b,
+          referee: pick,
+          field: f + 1,  // A:1, B:2, C:3, D:4
+          round: r
+        });
+      }
+    }
+
+    return scheduled;
+  }
+
+
 
 
   // ====== FALLBACK: TUA LOGICA ORIGINALE (INVARIATA) ======

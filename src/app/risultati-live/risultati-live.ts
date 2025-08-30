@@ -20,7 +20,7 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
   state: any = null;
 
   // Classifica Generale (Material)
-  displayedColumnsGenerale = ['rank','team','girone','giocate','vittorie','pf','ps','diff','pt'];
+  displayedColumnsGenerale = ['rank','team', 'pt','girone','giocate','vittorie','pf','ps','diff'];
 
   constructor(private tournament: TournamentService) {}
 
