@@ -148,11 +148,14 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
   }
 
 
-  /** Classifica generale calcolata SOLO dalle squadre presenti nei gironi e dai match con punteggio */
-  /** Classifica generale calcolata SOLO dalle squadre presenti nei gironi e dai match con punteggio
- *  Ordinamento: 1) winRate (vittorie/giocate)  2) pt  3) diff  4) pf  5) nome
+/** Classifica generale con ordinamento:
+ *  1) winRate (vittorie/giocate)
+ *  2) diffPerGame (diff/giocate)
+ *  3) pt
+ *  4) diff
+ *  5) pf
+ *  6) nome (tie-break finale)
  */
-/** Classifica generale con ordinamento per winRate > pt > diff > pf > nome */
 globalStandings(): Array<{
   team: string; girone: string; giocate: number; vittorie: number;
   pf: number; ps: number; diff: number; pt: number;
@@ -174,19 +177,23 @@ globalStandings(): Array<{
     }
   }
 
-  // stats iniziali
+  // record statistico
   type Rec = {
     team: string; girone: string; giocate: number; vittorie: number;
-    pf: number; ps: number; diff: number; pt: number; winRate: number;
+    pf: number; ps: number; diff: number; pt: number;
+    winRate: number; diffPerGame: number;
   };
+
+  // init
   const stats = new Map<string, Rec>();
   for (const { team, girone } of valid.values()) {
     stats.set(`${girone}||${norm(team)}`, {
-      team, girone, giocate: 0, vittorie: 0, pf: 0, ps: 0, diff: 0, pt: 0, winRate: 0
+      team, girone, giocate: 0, vittorie: 0, pf: 0, ps: 0, diff: 0, pt: 0,
+      winRate: 0, diffPerGame: 0
     });
   }
 
-  // accumulo dai match
+  // accumula
   for (const m of matches) {
     const g = m.girone;
     const aName = this.nameOf(m.teamA);
@@ -213,27 +220,25 @@ globalStandings(): Array<{
     recB.diff = recB.pf - recB.ps;
   }
 
-  // punti classifica e winRate
+  // calcoli derivati
   for (const rec of stats.values()) {
     rec.pt = rec.vittorie * 3;
     rec.winRate = rec.giocate > 0 ? rec.vittorie / rec.giocate : 0;
+    rec.diffPerGame = rec.giocate > 0 ? rec.diff / rec.giocate : 0;
   }
 
-  // ordinamento
+  // ordinamento secondo i criteri richiesti
   const out = Array.from(stats.values());
   out.sort((a, b) => {
-    if (b.winRate !== a.winRate) return b.winRate - a.winRate;
-    if (b.pt !== a.pt) return b.pt - a.pt;
-    if (b.diff !== a.diff) return b.diff - a.diff;
-    if (b.pf !== a.pf) return b.pf - a.pf;
-    return a.team.localeCompare(b.team);
+    if (b.winRate !== a.winRate) return b.winRate - a.winRate;                 // 1) winRate
+    if (b.diffPerGame !== a.diffPerGame) return b.diffPerGame - a.diffPerGame; // 2) diff/giocate
+    if (b.pt !== a.pt) return b.pt - a.pt;                                     // 3) pt
+    if (b.diff !== a.diff) return b.diff - a.diff;                             // 4) diff
+    if (b.pf !== a.pf) return b.pf - a.pf;                                     // 5) pf
+    return a.team.localeCompare(b.team);                                       // 6) nome
   });
 
   return out;
 }
-
-
-
-
 
 }
