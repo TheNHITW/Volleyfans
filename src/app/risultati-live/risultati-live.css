@@ -219,3 +219,18 @@ html, body {
   .rounds-wrap .score{ font-size:12.5px; }
   .rounds-wrap .meta{ font-size:11.5px; min-width:68px; }
 }
+
+.x-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  max-width: 100%;
+  scrollbar-gutter: stable;
+}
+
+.scroll-inner {
+  display: inline-block;
+  min-width: 700px;  /* forza larghezza maggiore del viewport */
+  white-space: nowrap;
+}

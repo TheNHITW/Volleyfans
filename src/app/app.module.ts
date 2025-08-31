@@ -3,7 +3,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+
 
 import { routes } from './app.routes';
 
@@ -45,7 +47,7 @@ export class AppComponent {}
     AdminClassificheComponent,
     IscrivitiHome,
     AperivolleyForm,
-    RisultatiLiveComponent
+    RisultatiLiveComponent,
   ],
   imports: [
     BrowserModule,
@@ -62,7 +64,8 @@ export class AppComponent {}
     MatSelectModule,
     MatCheckboxModule,
     MatTableModule,  
-    MatListModule    
+    MatListModule,
+    ScrollingModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]
