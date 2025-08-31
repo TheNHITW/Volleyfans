@@ -148,78 +148,92 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
   }
 
 
-  /** Classifica generale: mostra sempre tutte le squadre iscritte */
+  /** Classifica generale calcolata SOLO dalle squadre presenti nei gironi e dai match con punteggio */
   globalStandings(): Array<{
     team: string; girone: string; giocate: number; vittorie: number;
     pf: number; ps: number; diff: number; pt: number;
   }> {
     const groups = this.state?.tournament?.groups || {};
-    const st = this.state?.tournament?.standings || {};
-    const allTeams: Array<{team: string, girone: string}> = [];
+    const matches: any[] = (this.state?.tournament?.matches || []) 
+      .filter((m: any) => m?.scoreA != null && m?.scoreB != null);
 
-    // 1) Raccogli tutte le squadre dai gironi
+    // normalizza stringhe per match/team key
+    const norm = (s: any) => String(this.nameOf(s) || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+
+    // 1) elenco "valido" delle squadre presenti adesso (niente ghost)
+    const valid = new Map<string, { team: string; girone: string }>(); // key = g||team_norm
     for (const g of Object.keys(groups).sort()) {
-      const teams: string[] = (groups[g] || [])
-        .map((t: any) => this.nameOf(t));
-      for (const team of teams) {
-        allTeams.push({ team, girone: g });
+      for (const t of (groups[g] || [])) {
+        const name = this.nameOf(t);
+        if (!name) continue;
+        valid.set(`${g}||${norm(name)}`, { team: name, girone: g });
       }
     }
 
-    // 2) Semina tutte con stats = 0
-    const map = new Map<string, {
+    // 2) mappa stats inizializzata a 0 SOLO per le squadre valide
+    const stats = new Map<string, {
       team: string; girone: string; giocate: number; vittorie: number;
       pf: number; ps: number; diff: number; pt: number;
     }>();
-
-    for (const t of allTeams) {
-      const key = `${t.girone}::${t.team}`;
-      map.set(key, {
-        team: t.team,
-        girone: t.girone,
-        giocate: 0,
-        vittorie: 0,
-        pf: 0,
-        ps: 0,
-        diff: 0,
-        pt: 0,
+    for (const { team, girone } of valid.values()) {
+      stats.set(`${girone}||${norm(team)}`, {
+        team, girone, giocate: 0, vittorie: 0, pf: 0, ps: 0, diff: 0, pt: 0
       });
     }
 
-    // 3) Applica overlay standings se ci sono
-    for (const g of Object.keys(st)) {
-      for (const row of st[g] || []) {
-        const team = row.teamName ?? row.team ?? '';
-        const key = `${g}::${team}`;
-        if (!team) continue;
-        const pf = Number(row.pf ?? 0);
-        const ps = Number(row.ps ?? row.pa ?? 0);
-        const vittorie = Number(row.vittorie ?? row.wins ?? 0);
-        const pt = Number(row.pt ?? row.points ?? (vittorie * 3));
-        map.set(key, {
-          team,
-          girone: g,
-          giocate: Number(row.giocate ?? 0),
-          vittorie,
-          pf,
-          ps,
-          diff: Number(row.diff ?? (pf - ps)),
-          pt,
-        });
-      }
+    // 3) accumula dai match (solo se entrambe le squadre sono ancora presenti nei gironi)
+    for (const m of matches) {
+      const g = m.girone;
+      const aName = this.nameOf(m.teamA);
+      const bName = this.nameOf(m.teamB);
+      const kA = `${g}||${norm(aName)}`;
+      const kB = `${g}||${norm(bName)}`;
+
+      // se una delle due non è più nel girone → ignora il match (evita squadre fantasma)
+      if (!valid.has(kA) || !valid.has(kB)) continue;
+
+      const sA = Number(m.scoreA);
+      const sB = Number(m.scoreB);
+
+      const recA = stats.get(kA)!;
+      const recB = stats.get(kB)!;
+
+      recA.giocate += 1;
+      recB.giocate += 1;
+
+      recA.pf += sA; recA.ps += sB;
+      recB.pf += sB; recB.ps += sA;
+
+      if (sA > sB) recA.vittorie += 1;
+      else if (sB > sA) recB.vittorie += 1;
+      // in caso di pareggio non assegniamo vittorie (pt rimarranno 0 per quel match)
+
+      recA.diff = recA.pf - recA.ps;
+      recB.diff = recB.pf - recB.ps;
     }
 
-    // 4) Array + ordinamento
-    const out = Array.from(map.values());
+    // 4) punti classifica: 3 per vittoria, 0 altrimenti (coerente con admin)
+    for (const rec of stats.values()) {
+      rec.pt = rec.vittorie * 3;
+    }
+
+    // 5) array + ordinamento
+    const out = Array.from(stats.values());
     out.sort((a, b) => {
       if (b.pt !== a.pt) return b.pt - a.pt;
       if (b.vittorie !== a.vittorie) return b.vittorie - a.vittorie;
       if (b.diff !== a.diff) return b.diff - a.diff;
       if (b.pf !== a.pf) return b.pf - a.pf;
+      // ultimo tie-break: alfabetico
       return a.team.localeCompare(b.team);
     });
+
     return out;
   }
+
 
 
 }

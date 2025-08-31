@@ -316,7 +316,7 @@ function generateMatchesForAllGroups(groups) {
 
   // Mappa "pura" solo con NOME squadra
   const pure = {};
-  for (const g of groupKeys) {
+  for (const g of groupKeys) { 
     pure[g] = (groups[g] || []).map(nameOf);
   }
 
@@ -462,101 +462,235 @@ function generateMatchesForAllGroups(groups) {
     return scheduled;
   }
 
-  // === NUOVO SCENARIO 3: 3×G4 + 1×G3 ===
+  // === SCENARIO 3 (RISCRITTO): 3×G4 + 1×G3 (15 squadre) ===
+  // - 6 round, 4 campi: ogni round 1 match per ciascuno dei 3 gironi da 4 (A,B,C) + 1 match del girone da 3 (D).
+  // - Arbitri G4: SEMPRE interni (target 2–1–2–1 per girone, evitando back-to-back se possibile).
+  // - Arbitri G3: interni; se la "terza" è late prima di startRound, arbitro esterno da G4 (meno carico).
+  // - Supporta 1 squadra "late" con { group, team, startRound } (prende da arguments[1]?.lateArrival o const LATE).
   if (g4Keys.length === 3 && g3Keys.length === 1 && FIELDS_PER_ROUND === 4) {
-    const [g4AKey, g4BKey, g4CKey] = g4Keys;
+    // late option
+    const late = (typeof arguments[1] === 'object' && arguments[1] && arguments[1].lateArrival)
+      ? arguments[1].lateArrival
+      : (typeof LATE !== 'undefined' ? LATE : null);
+
+    // Ordine stabile
+    const [gA, gB, gC] = g4Keys;
     const g3Key = g3Keys[0];
 
-    const G4A = pure[g4AKey].slice();
-    const G4B = pure[g4BKey].slice();
-    const G4C = pure[g4CKey].slice();
+    // Copie team
+    const G4A = pure[gA].slice();
+    const G4B = pure[gB].slice();
+    const G4C = pure[gC].slice();
     const G3D = pure[g3Key].slice();
 
-    const A = berger4(G4A);
-    const B = berger4(G4B);
-    const C = berger4(G4C);
+    // Berger/rr3
+    const berger4 = (t) => [
+      [[t[0], t[3]], [t[1], t[2]]],
+      [[t[0], t[2]], [t[3], t[1]]],
+      [[t[0], t[1]], [t[2], t[3]]],
+    ];
+    const rr3 = (t) => [[t[0], t[1]], [t[1], t[2]], [t[0], t[2]]];
+
+    const A = berger4(G4A), B = berger4(G4B), C = berger4(G4C);
     const D = rr3(G3D);
 
+    // Espandi in 6 match per G4: ordine "spaziato" per evitare 3-in-fila
+    function expandG4(T, blocks) {
+      const matches = [];
+      for (let b = 0; b < 3; b++) {
+        for (let m = 0; m < 2; m++) {
+          const p = blocks[b][m]; // [a,b]
+          const idle = T.filter(x => x !== p[0] && x !== p[1]); // le 2 che riposano
+          matches.push({ a: p[0], b: p[1], idle, referee: null });
+        }
+      }
+      // ordine: [b0m0,b0m1,b1m0,b1m1,b2m0,b2m1] → pattern t0: R1,R3,R5; t1: R2,R4,R5; t2: R2,R3,R6; t3: R1,R4,R6
+      return matches;
+    }
+
+    const perGroup = {
+      [gA]: { teams: G4A, matches: expandG4(G4A, A) },
+      [gB]: { teams: G4B, matches: expandG4(G4B, B) },
+      [gC]: { teams: G4C, matches: expandG4(G4C, C) },
+    };
+
+    // --- Gestione "late" se è in un G4: sposta i 3 match del late in R4–R6, scegliendo avversaria "safe" in R4 ---
+    function reorderG4ForLate(gKey, teamName, startRound) {
+      const PG = perGroup[gKey];
+      if (!PG) return;
+      const tLate = teamName;
+      const early = [], lateM = [];
+      for (const m of PG.matches) {
+        ((m.a === tLate || m.b === tLate) ? lateM : early).push(m);
+      }
+      if (early.length === 3 && lateM.length === 3 && startRound >= 4) {
+        // chi ha giocato R3 tra le "presenti" (sono i due di early[2])
+        const r3Teams = new Set([early[2].a, early[2].b]);
+        const present = PG.teams.filter(t => t !== tLate);
+        const preferForR4 = present.find(t => !r3Teams.has(t)) || present[0];
+        // scegli come primo match "late" quello vs preferForR4
+        const idx = lateM.findIndex(m => (m.a === tLate ? m.b : m.a) === preferForR4);
+        const firstLate = idx >= 0 ? lateM.splice(idx, 1)[0] : lateM.shift();
+        PG.matches = [...early, firstLate, ...lateM]; // R1-3 early, R4 il "safe", R5-6 gli altri
+      }
+    }
+    if (late && [gA, gB, gC].includes(late.group) && pure[late.group]?.includes(late.team)) {
+      reorderG4ForLate(late.group, late.team, Number(late.startRound) || 4);
+    }
+
+    // --- G3 pianificazione round ---
+    // default (nessun late in G3): D[0]→R2, D[1]→R4, D[2]→R6
+    // late in G3 (startRound>=4): R3 (presenti vs presenti), R4 e R6 (late vs present)
+    const g3ByRound = Array(6).fill(null); // 1..6
+    function placeG3Default() {
+      g3ByRound[1] = { a: D[0][0], b: D[0][1] }; // R2
+      g3ByRound[3] = { a: D[1][0], b: D[1][1] }; // R4
+      g3ByRound[5] = { a: D[2][0], b: D[2][1] }; // R6
+    }
+    function placeG3WithLate(teamName, startRound) {
+      const tLate = teamName;
+      const all = [
+        { a: D[0][0], b: D[0][1] },
+        { a: D[1][0], b: D[1][1] },
+        { a: D[2][0], b: D[2][1] },
+      ];
+      const involvesLate = (m) => m.a === tLate || m.b === tLate;
+      const early = all.find(m => !involvesLate(m));
+      const lateMs = all.filter(involvesLate);
+      // R3: presenti vs presenti (early), R4 e R6: match con late
+      g3ByRound[2] = early || null;       // R3
+      g3ByRound[3] = lateMs[0] || null;   // R4
+      g3ByRound[5] = lateMs[1] || null;   // R6
+    }
+
+    if (late && late.group === g3Key && G3D.includes(late.team) && (Number(late.startRound) || 4) >= 4) {
+      placeG3WithLate(late.team, Number(late.startRound) || 4);
+    } else {
+      placeG3Default();
+    }
+
+    // --- Arbitri interni G4: target 2–1–2–1 per girone (offset alternato per equità globale) ---
+    const groupIdx = new Map([[gA,0],[gB,1],[gC,2]]);
+    const perGroupRefCount = {};
+    const perGroupLastRef = {};
+    function targetForG4(gKey) {
+      const T = perGroup[gKey].teams;
+      const offset = (groupIdx.get(gKey) % 2); // alterna chi ha "2": A/C → [1,2,1,2], B → [2,1,2,1]  (o viceversa)
+      return new Map(T.map((t,i) => [t, ((i + offset) % 2) ? 2 : 1]));
+    }
+    function canRef(gKey, team, round) {
+      if (!late) return true;
+      if (late.group !== gKey) return true;
+      if (team !== late.team) return true;
+      return round >= (Number(late.startRound) || 4); // late non arbitra prima di startRound
+    }
+
+    // --- Arbitro esterno per G3 (solo se la "terza" è late prima di startRound) ---
+    const extRefCount = new Map(); // "G::Team" -> count
+    let lastExtRef = null;
+    const keyOf = (g, t) => `${g}::${t}`;
+
+    // Programmazione: per ogni round assegnamo: gA→campo1, gB→campo2, gC→campo3, g3→campo4 (se presente)
     const scheduled = [];
+    for (let r = 1; r <= 6; r++) {
+      // 1) G4 interni (A,B,C)
+      const leftoverIdle = []; // candidati esterni liberi per l'eventuale match G3
+      for (const [gKey, field] of [[gA,1],[gB,2],[gC,3]]) {
+        const PG = perGroup[gKey];
+        const T  = PG.teams;
+        const M  = PG.matches[r - 1]; // match del round per il girone
+        // setup contatori
+        if (!perGroupRefCount[gKey]) perGroupRefCount[gKey] = new Map(T.map(t => [t, 0]));
+        const refCountMap = perGroupRefCount[gKey];
+        const lastRef = perGroupLastRef[gKey] || null;
+        const target = targetForG4(gKey);
 
-    // Helper per prendere arbitri da un girone G4 (lista 4 squadre distinte)
-    const takeRefsFrom = (teams4, n) => teams4.slice(0, n);
+        // candidati: idle ma disponibili (late gating)
+        const cands = M.idle.filter(t => canRef(gKey, t, r));
+        // (se per assurdo nessuno disponibile, tieni il primo idle)
+        if (cands.length === 0) cands.push(M.idle[0]);
 
-    /**
-     * Piano (6 round):
-     * R1: A blk1 + B blk1 (4 campi)  → arbitra C (tutte e 4 le squadre, una per campo)
-     * R2: C blk1 + D(1–2) (3 campi)  → arbitri C: da A e B; D interno (g3RefOf)
-     * R3: A blk2 + B blk2 (4 campi)  → arbitra C
-     * R4: C blk2 + D(2–3) (3 campi)  → arbitri C: da A e B; D interno
-     * R5: A blk3 + B blk3 (4 campi)  → arbitra C
-     * R6: C blk3 + D(1–3) (3 campi)  → arbitri C: da A e B; D interno
-     */
+        // pick: sotto-target → meno carico → evita back-to-back → ordine
+        cands.sort((a, b) => {
+          const needA = (refCountMap.get(a)||0) - (target.get(a)||0);
+          const needB = (refCountMap.get(b)||0) - (target.get(b)||0);
+          if (needA !== needB) return needA - needB;
+          const ra = refCountMap.get(a)||0, rb = refCountMap.get(b)||0;
+          if (ra !== rb) return ra - rb;
+          if (lastRef && (a === lastRef) !== (b === lastRef)) return (a === lastRef) ? 1 : -1;
+          return T.indexOf(a) - T.indexOf(b);
+        });
+        const pick = cands[0];
 
-    // R1 — A blk1 (2) + B blk1 (2) — arbitri: C[0..3]
-    {
-      const refs = takeRefsFrom(G4C, 4);
-      scheduled.push(
-        { id:idFor(g4AKey, A[0][0][0], A[0][0][1]), girone:g4AKey, teamA:A[0][0][0], teamB:A[0][0][1], referee:refs[0], field:1, round:1 },
-        { id:idFor(g4AKey, A[0][1][0], A[0][1][1]), girone:g4AKey, teamA:A[0][1][0], teamB:A[0][1][1], referee:refs[1], field:2, round:1 },
-        { id:idFor(g4BKey, B[0][0][0], B[0][0][1]), girone:g4BKey, teamA:B[0][0][0], teamB:B[0][0][1], referee:refs[2], field:3, round:1 },
-        { id:idFor(g4BKey, B[0][1][0], B[0][1][1]), girone:g4BKey, teamA:B[0][1][0], teamB:B[0][1][1], referee:refs[3], field:4, round:1 }
-      );
-    }
+        // registra interno
+        refCountMap.set(pick, (refCountMap.get(pick)||0) + 1);
+        perGroupLastRef[gKey] = pick;
 
-    // R2 — C blk1 (2) + D(1–2) (1) — arbitri C: da A[0],B[0]; D interno
-    {
-      scheduled.push(
-        { id:idFor(g4CKey, C[0][0][0], C[0][0][1]), girone:g4CKey, teamA:C[0][0][0], teamB:C[0][0][1], referee:G4A[0], field:1, round:2 },
-        { id:idFor(g4CKey, C[0][1][0], C[0][1][1]), girone:g4CKey, teamA:C[0][1][0], teamB:C[0][1][1], referee:G4B[0], field:2, round:2 },
-        { id:idFor(g3Key,   D[0][0],    D[0][1]),   girone:g3Key, teamA:D[0][0],    teamB:D[0][1],    referee:g3RefOf(G3D, D[0]), field:3, round:2 }
-        // campo 4 libero
-      );
-    }
+        scheduled.push({
+          id: idFor(gKey, M.a, M.b),
+          girone: gKey,
+          teamA: M.a,
+          teamB: M.b,
+          referee: pick,
+          field,
+          round: r
+        });
 
-    // R3 — A blk2 (2) + B blk2 (2) — arbitri: C[0..3]
-    {
-      const refs = takeRefsFrom(G4C, 4);
-      scheduled.push(
-        { id:idFor(g4AKey, A[1][0][0], A[1][0][1]), girone:g4AKey, teamA:A[1][0][0], teamB:A[1][0][1], referee:refs[0], field:1, round:3 },
-        { id:idFor(g4AKey, A[1][1][0], A[1][1][1]), girone:g4AKey, teamA:A[1][1][0], teamB:A[1][1][1], referee:refs[1], field:2, round:3 },
-        { id:idFor(g4BKey, B[1][0][0], B[1][0][1]), girone:g4BKey, teamA:B[1][0][0], teamB:B[1][0][1], referee:refs[2], field:3, round:3 },
-        { id:idFor(g4BKey, B[1][1][0], B[1][1][1]), girone:g4BKey, teamA:B[1][1][0], teamB:B[1][1][1], referee:refs[3], field:4, round:3 }
-      );
-    }
+        // l'altro idle (quello non scelto) rimane libero → candidato esterno per G3
+        const otherIdle = M.idle.find(t => t !== pick);
+        if (otherIdle) leftoverIdle.push({ gKey, team: otherIdle });
+      }
 
-    // R4 — C blk2 (2) + D(2–3) (1) — arbitri C: da A[1],B[1]; D interno
-    {
-      scheduled.push(
-        { id:idFor(g4CKey, C[1][0][0], C[1][0][1]), girone:g4CKey, teamA:C[1][0][0], teamB:C[1][0][1], referee:G4A[1], field:1, round:4 },
-        { id:idFor(g4CKey, C[1][1][0], C[1][1][1]), girone:g4CKey, teamA:C[1][1][0], teamB:C[1][1][1], referee:G4B[1], field:2, round:4 },
-        { id:idFor(g3Key,   D[1][0],    D[1][1]),   girone:g3Key, teamA:D[1][0],    teamB:D[1][1],    referee:g3RefOf(G3D, D[1]), field:3, round:4 }
-        // campo 4 libero
-      );
-    }
+      // 2) G3 match (campo 4) — interno se possibile, altrimenti arbitro esterno bilanciato
+      const M3 = g3ByRound[r - 1];
+      if (M3) {
+        // referee interno (la terza)
+        const third = (() => {
+          const set = new Set([M3.a, M3.b]);
+          return (G3D.find(x => !set.has(x)) || null);
+        })();
 
-    // R5 — A blk3 (2) + B blk3 (2) — arbitri: C[0..3]
-    {
-      const refs = takeRefsFrom(G4C, 4);
-      scheduled.push(
-        { id:idFor(g4AKey, A[2][0][0], A[2][0][1]), girone:g4AKey, teamA:A[2][0][0], teamB:A[2][0][1], referee:refs[0], field:1, round:5 },
-        { id:idFor(g4AKey, A[2][1][0], A[2][1][1]), girone:g4AKey, teamA:A[2][1][0], teamB:A[2][1][1], referee:refs[1], field:2, round:5 },
-        { id:idFor(g4BKey, B[2][0][0], B[2][0][1]), girone:g4BKey, teamA:B[2][0][0], teamB:B[2][0][1], referee:refs[2], field:3, round:5 },
-        { id:idFor(g4BKey, B[2][1][0], B[2][1][1]), girone:g4BKey, teamA:B[2][1][0], teamB:B[2][1][1], referee:refs[3], field:4, round:5 }
-      );
-    }
+        let ref3 = null;
+        const lateBlocksThird = (late && late.group === g3Key && third === late.team && r < (Number(late.startRound)||4));
+        if (!lateBlocksThird && third) {
+          ref3 = third; // interno
+        } else {
+          // serve esterno: scegli tra leftoverIdle quello con min extRefCount, evitando back-to-back se possibile
+          const cand = leftoverIdle.slice().sort((x, y) => {
+            const kx = keyOf(x.gKey, x.team), ky = keyOf(y.gKey, y.team);
+            const cx = extRefCount.get(kx) || 0, cy = extRefCount.get(ky) || 0;
+            if (cx !== cy) return cx - cy;
+            if (lastExtRef && (kx === lastExtRef) !== (ky === lastExtRef)) return (kx === lastExtRef) ? 1 : -1;
+            // preferisci provenienze diverse per equità fra gironi
+            if (x.gKey !== y.gKey) return x.gKey.localeCompare(y.gKey);
+            return pure[x.gKey].indexOf(x.team) - pure[y.gKey].indexOf(y.team);
+          });
+          const chosen = cand[0];
+          if (chosen) {
+            const k = keyOf(chosen.gKey, chosen.team);
+            extRefCount.set(k, (extRefCount.get(k)||0) + 1);
+            lastExtRef = k;
+            ref3 = chosen.team;
+          } else {
+            ref3 = null; // estremo fallback
+          }
+        }
 
-    // R6 — C blk3 (2) + D(1–3) (1) — arbitri C: da A[2],B[2]; D interno
-    {
-      scheduled.push(
-        { id:idFor(g4CKey, C[2][0][0], C[2][0][1]), girone:g4CKey, teamA:C[2][0][0], teamB:C[2][0][1], referee:G4A[2], field:1, round:6 },
-        { id:idFor(g4CKey, C[2][1][0], C[2][1][1]), girone:g4CKey, teamA:C[2][1][0], teamB:C[2][1][1], referee:G4B[2], field:2, round:6 },
-        { id:idFor(g3Key,   D[2][0],    D[2][1]),   girone:g3Key, teamA:D[2][0],    teamB:D[2][1],    referee:g3RefOf(G3D, D[2]), field:3, round:6 }
-        // campo 4 libero
-      );
+        scheduled.push({
+          id: idFor(g3Key, M3.a, M3.b),
+          girone: g3Key,
+          teamA: M3.a,
+          teamB: M3.b,
+          referee: ref3,
+          field: 4,
+          round: r
+        });
+      }
     }
 
     return scheduled;
   }
+
 
   // === SCENARIO 4: 4×G4 (16 squadre) — arbitri SOLO dal proprio girone
   // Supporta 1 squadra "in ritardo", presente solo da un certo round (es. round 4).
