@@ -149,90 +149,90 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
 
 
   /** Classifica generale calcolata SOLO dalle squadre presenti nei gironi e dai match con punteggio */
-  globalStandings(): Array<{
-    team: string; girone: string; giocate: number; vittorie: number;
-    pf: number; ps: number; diff: number; pt: number;
-  }> {
-    const groups = this.state?.tournament?.groups || {};
-    const matches: any[] = (this.state?.tournament?.matches || []) 
-      .filter((m: any) => m?.scoreA != null && m?.scoreB != null);
+  /** Classifica generale calcolata SOLO dalle squadre presenti nei gironi e dai match con punteggio
+ *  Ordinamento: 1) winRate (vittorie/giocate)  2) pt  3) diff  4) pf  5) nome
+ */
+/** Classifica generale con ordinamento per winRate > pt > diff > pf > nome */
+globalStandings(): Array<{
+  team: string; girone: string; giocate: number; vittorie: number;
+  pf: number; ps: number; diff: number; pt: number;
+}> {
+  const groups = this.state?.tournament?.groups || {};
+  const matches: any[] = (this.state?.tournament?.matches || [])
+    .filter((m: any) => m?.scoreA != null && m?.scoreB != null);
 
-    // normalizza stringhe per match/team key
-    const norm = (s: any) => String(this.nameOf(s) || '')
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, ' ');
+  const norm = (s: any) => String(this.nameOf(s) || '')
+    .trim().toLowerCase().replace(/\s+/g, ' ');
 
-    // 1) elenco "valido" delle squadre presenti adesso (niente ghost)
-    const valid = new Map<string, { team: string; girone: string }>(); // key = g||team_norm
-    for (const g of Object.keys(groups).sort()) {
-      for (const t of (groups[g] || [])) {
-        const name = this.nameOf(t);
-        if (!name) continue;
-        valid.set(`${g}||${norm(name)}`, { team: name, girone: g });
-      }
+  // squadre valide (presenti nei gironi)
+  const valid = new Map<string, { team: string; girone: string }>();
+  for (const g of Object.keys(groups).sort()) {
+    for (const t of (groups[g] || [])) {
+      const name = this.nameOf(t);
+      if (!name) continue;
+      valid.set(`${g}||${norm(name)}`, { team: name, girone: g });
     }
-
-    // 2) mappa stats inizializzata a 0 SOLO per le squadre valide
-    const stats = new Map<string, {
-      team: string; girone: string; giocate: number; vittorie: number;
-      pf: number; ps: number; diff: number; pt: number;
-    }>();
-    for (const { team, girone } of valid.values()) {
-      stats.set(`${girone}||${norm(team)}`, {
-        team, girone, giocate: 0, vittorie: 0, pf: 0, ps: 0, diff: 0, pt: 0
-      });
-    }
-
-    // 3) accumula dai match (solo se entrambe le squadre sono ancora presenti nei gironi)
-    for (const m of matches) {
-      const g = m.girone;
-      const aName = this.nameOf(m.teamA);
-      const bName = this.nameOf(m.teamB);
-      const kA = `${g}||${norm(aName)}`;
-      const kB = `${g}||${norm(bName)}`;
-
-      // se una delle due non è più nel girone → ignora il match (evita squadre fantasma)
-      if (!valid.has(kA) || !valid.has(kB)) continue;
-
-      const sA = Number(m.scoreA);
-      const sB = Number(m.scoreB);
-
-      const recA = stats.get(kA)!;
-      const recB = stats.get(kB)!;
-
-      recA.giocate += 1;
-      recB.giocate += 1;
-
-      recA.pf += sA; recA.ps += sB;
-      recB.pf += sB; recB.ps += sA;
-
-      if (sA > sB) recA.vittorie += 1;
-      else if (sB > sA) recB.vittorie += 1;
-      // in caso di pareggio non assegniamo vittorie (pt rimarranno 0 per quel match)
-
-      recA.diff = recA.pf - recA.ps;
-      recB.diff = recB.pf - recB.ps;
-    }
-
-    // 4) punti classifica: 3 per vittoria, 0 altrimenti (coerente con admin)
-    for (const rec of stats.values()) {
-      rec.pt = rec.vittorie * 3;
-    }
-
-    // 5) array + ordinamento
-    const out = Array.from(stats.values());
-    out.sort((a, b) => {
-      if (b.pt !== a.pt) return b.pt - a.pt;
-      if (b.vittorie !== a.vittorie) return b.vittorie - a.vittorie;
-      if (b.diff !== a.diff) return b.diff - a.diff;
-      if (b.pf !== a.pf) return b.pf - a.pf;
-      // ultimo tie-break: alfabetico
-      return a.team.localeCompare(b.team);
-    });
-
-    return out;
   }
+
+  // stats iniziali
+  type Rec = {
+    team: string; girone: string; giocate: number; vittorie: number;
+    pf: number; ps: number; diff: number; pt: number; winRate: number;
+  };
+  const stats = new Map<string, Rec>();
+  for (const { team, girone } of valid.values()) {
+    stats.set(`${girone}||${norm(team)}`, {
+      team, girone, giocate: 0, vittorie: 0, pf: 0, ps: 0, diff: 0, pt: 0, winRate: 0
+    });
+  }
+
+  // accumulo dai match
+  for (const m of matches) {
+    const g = m.girone;
+    const aName = this.nameOf(m.teamA);
+    const bName = this.nameOf(m.teamB);
+    const kA = `${g}||${norm(aName)}`;
+    const kB = `${g}||${norm(bName)}`;
+    if (!valid.has(kA) || !valid.has(kB)) continue;
+
+    const sA = Number(m.scoreA);
+    const sB = Number(m.scoreB);
+    const recA = stats.get(kA)!;
+    const recB = stats.get(kB)!;
+
+    recA.giocate += 1;
+    recB.giocate += 1;
+
+    recA.pf += sA; recA.ps += sB;
+    recB.pf += sB; recB.ps += sA;
+
+    if (sA > sB) recA.vittorie += 1;
+    else if (sB > sA) recB.vittorie += 1;
+
+    recA.diff = recA.pf - recA.ps;
+    recB.diff = recB.pf - recB.ps;
+  }
+
+  // punti classifica e winRate
+  for (const rec of stats.values()) {
+    rec.pt = rec.vittorie * 3;
+    rec.winRate = rec.giocate > 0 ? rec.vittorie / rec.giocate : 0;
+  }
+
+  // ordinamento
+  const out = Array.from(stats.values());
+  out.sort((a, b) => {
+    if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+    if (b.pt !== a.pt) return b.pt - a.pt;
+    if (b.diff !== a.diff) return b.diff - a.diff;
+    if (b.pf !== a.pf) return b.pf - a.pf;
+    return a.team.localeCompare(b.team);
+  });
+
+  return out;
+}
+
+
 
 
 
