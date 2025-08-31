@@ -1,12 +1,12 @@
-<h2>Risultati Live</h2>
-<div class="page">
+<h2 class="mat-headline-5" style="margin:0 0 .5rem;">Risultati Live</h2>
+<div class="page mat-typography">
 
   <!-- 1) Composizione Gironi -->
   <mat-card class="card-section">
-    <h3>Composizione Gironi</h3>
+    <h3 class="mat-title-large">Composizione Gironi</h3>
     <div class="gironi-grid">
-      <mat-card *ngFor="let g of groupEntries()" class="girone-block">
-        <h4>Girone {{ g.key }}</h4>
+      <mat-card *ngFor="let g of groupEntries()" class="girone-block mat-elevation-z2">
+        <h4 class="mat-title-medium">Girone {{ g.key }}</h4>
         <mat-list>
           <mat-list-item *ngFor="let t of g.teams">{{ t }}</mat-list-item>
         </mat-list>
@@ -15,69 +15,74 @@
     <p *ngIf="groupEntries().length === 0" class="muted">— Nessun girone disponibile —</p>
   </mat-card>
 
-  <!-- 2) Matrice risultati + risultati per round -->
+  <!-- 2) Matrice risultati + Risultati per round (MATRIX = MAT-TABLE) -->
   <mat-card class="card-section">
-    <h3>Matrice risultati - Tutti i Gironi</h3>
+    <h3 class="mat-title-large">Matrice risultati — Tutti i Gironi</h3>
 
     <ng-container *ngFor="let sec of resultSections()">
-      <div *ngIf="sec.teams?.length" class="matrix-grid">
+      <div *ngIf="sec?.teams?.length" class="matrix-grid">
 
-        <!-- SINISTRA: MATRICE -->
+        <!-- SINISTRA: MAT-TABLE con sticky nativo -->
         <div class="matrix-wrap">
-          <h4>Girone {{ sec.key }}</h4>
+          <h4 class="mat-title-medium">Girone {{ sec.key }}</h4>
+          <div class="x-scroll">
+            <table mat-table [dataSource]="sec.rows" class="matrix-mat-table mat-elevation-z8">
 
-          <!-- wrapper scrollabile SOLO per le colonne non lockate -->
-          <div class="table-wrapper x-scroll">
-            <table class="matrix-table mat-elevation-z8 full-width">
-              <thead>
-                <tr>
-                  <th class="corner">#</th>
-                  <th class="row-team-hd">Squadra</th>
-                  <th *ngFor="let t of sec.teams; let j=index" class="col-team">{{ j+1 }}</th>
-                  <th class="stat stat-hd">V/S</th>
-                  <th class="stat stat-hd">Punti</th>
-                  <th class="stat stat-hd">Diff.</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of sec.rows; index as i">
-                  <th class="row-index">{{ i+1 }}</th>
-                  <th class="row-team" title="{{sec.teams[i]}}">{{ sec.teams[i] }}</th>
+              <!-- # (sticky) -->
+              <ng-container matColumnDef="idx" sticky>
+                <th mat-header-cell *matHeaderCellDef class="col-idx">#</th>
+                <td mat-cell *matCellDef="let row; let i = index" class="col-idx">{{ i+1 }}</td>
+              </ng-container>
 
-                  <td *ngFor="let cell of row" [ngClass]="cell.cls">{{ cell.text }}</td>
+              <!-- Squadra (sticky) -->
+              <ng-container matColumnDef="team" sticky>
+                <th mat-header-cell *matHeaderCellDef class="col-team">Squadra</th>
+                <td mat-cell *matCellDef="let row; let i = index" class="col-team">{{ sec.teams[i] }}</td>
+              </ng-container>
 
-                  <td class="stat vs">
-                    <span [class.pos]="sec.stats[i].v - sec.stats[i].s > 0"
-                          [class.neg]="sec.stats[i].v - sec.stats[i].s < 0">
-                      {{ sec.stats[i].v }}-{{ sec.stats[i].s }}
-                    </span>
-                  </td>
-                  <td class="stat pf">{{ sec.stats[i].puntiTotali }}</td>
-                  <td class="stat diff">
-                    <span [class.pos]="sec.stats[i].diffPunti > 0"
-                          [class.neg]="sec.stats[i].diffPunti < 0">
-                      {{ sec.stats[i].diffPunti }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
+              <!-- Colonne dinamiche c0..cN-1 -->
+              <ng-container *ngFor="let t of sec.teams; let j=index" [matColumnDef]="'c'+j">
+                <th mat-header-cell *matHeaderCellDef class="col-c">{{ j+1 }}</th>
+                <td mat-cell *matCellDef="let row" class="col-c" [ngClass]="{
+                    'matrix-cell-win': row[j]?.cls === 'win',
+                    'matrix-cell-loss': row[j]?.cls === 'loss',
+                    'matrix-cell-draw': row[j]?.cls === 'draw',
+                    'matrix-cell-diag': row[j]?.cls === 'diag'
+                  }">{{ row[j]?.text }}</td>
+              </ng-container>
+
+              <!-- Statistiche -->
+              <ng-container matColumnDef="vs">
+                <th mat-header-cell *matHeaderCellDef class="col-vs">V/S</th>
+                <td mat-cell *matCellDef="let row; let i = index" class="col-vs">{{ sec.stats[i].v }}-{{ sec.stats[i].s }}</td>
+              </ng-container>
+              <ng-container matColumnDef="pf">
+                <th mat-header-cell *matHeaderCellDef class="col-pf">Punti</th>
+                <td mat-cell *matCellDef="let row; let i = index" class="col-pf">{{ sec.stats[i].puntiTotali }}</td>
+              </ng-container>
+              <ng-container matColumnDef="diff">
+                <th mat-header-cell *matHeaderCellDef class="col-diff">Diff.</th>
+                <td mat-cell *matCellDef="let row; let i = index" class="col-diff">{{ sec.stats[i].diffPunti }}</td>
+              </ng-container>
+
+              <!-- Header sticky top -->
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsMatrix(sec); sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsMatrix(sec)"></tr>
             </table>
           </div>
         </div>
 
-        <!-- DESTRA: RISULTATI PER ROUND (stile gironi, super-compatto su mobile) -->
-        <div class="rounds-wrap rounds-like-gironi">
-          <h4>Risultati per round</h4>
-          <div *ngIf="sec.rounds.length > 0; else noRounds">
-            <div class="round-block" *ngFor="let rg of sec.rounds">
-              <div class="round-title">Round {{ rg.round }}</div>
+        <!-- DESTRA: RISULTATI PER ROUND -->
+        <div class="rounds-wrap">
+          <h4 class="mat-title-medium">Risultati per round</h4>
+          <div *ngIf="(sec.rounds ?? []).length > 0; else noRounds">
+            <div class="round-block" *ngFor="let rg of (sec.rounds ?? [])">
+              <div class="round-title mat-title-small">Round {{ rg.round }}</div>
               <ul>
                 <li *ngFor="let m of rg.matches">
                   <span class="teams">{{ m.teamA }} – {{ m.teamB }}</span>
                   <span class="score">
-                    <ng-container *ngIf="m.scoreA != null && m.scoreB != null; else dash">
-                      {{ m.scoreA }}–{{ m.scoreB }}
-                    </ng-container>
+                    <ng-container *ngIf="m.scoreA != null && m.scoreB != null; else dash">{{ m.scoreA }}–{{ m.scoreB }}</ng-container>
                     <ng-template #dash>—</ng-template>
                   </span>
                   <span class="meta">Campo {{ m.field || '—' }}</span>
@@ -85,9 +90,7 @@
               </ul>
             </div>
           </div>
-          <ng-template #noRounds>
-            <p class="muted">— Nessun risultato inserito —</p>
-          </ng-template>
+          <ng-template #noRounds><p class="muted">— Nessun risultato inserito —</p></ng-template>
         </div>
       </div>
     </ng-container>
@@ -95,63 +98,49 @@
 
   <!-- 3) Classifica Generale -->
   <mat-card class="card-section">
-    <h3>Classifica Generale</h3>
-
-    <!-- scroll SOLO qui, con # e Squadra lockate -->
-    <div class="table-wrapper x-scroll" *ngIf="globalStandings().length > 0; else noStandings">
-      <table mat-table [dataSource]="globalStandings()" class="mat-elevation-z8 full-width classifica-table">
-
-        <ng-container matColumnDef="rank">
-          <th mat-header-cell *matHeaderCellDef class="cls-sticky-idx">#</th>
-          <td mat-cell *matCellDef="let s; let i=index" class="cls-sticky-idx">{{ i+1 }}</td>
+    <h3 class="mat-title-large">Classifica Generale</h3>
+    <div class="x-scroll" *ngIf="globalStandings().length > 0; else noStandings">
+      <table mat-table [dataSource]="globalStandings()" class="mat-elevation-z8 classifica-table">
+        <ng-container matColumnDef="rank" sticky>
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let s; let i=index">{{ i+1 }}</td>
         </ng-container>
-
-        <ng-container matColumnDef="team">
-          <th mat-header-cell *matHeaderCellDef class="cls-sticky-team">Squadra</th>
-          <td mat-cell *matCellDef="let s" class="cls-sticky-team">{{ s.team }}</td>
+        <ng-container matColumnDef="team" sticky>
+          <th mat-header-cell *matHeaderCellDef>Squadra</th>
+          <td mat-cell *matCellDef="let s">{{ s.team }}</td>
         </ng-container>
-
         <ng-container matColumnDef="girone">
           <th mat-header-cell *matHeaderCellDef>Girone</th>
           <td mat-cell *matCellDef="let s">{{ s.girone }}</td>
         </ng-container>
-
         <ng-container matColumnDef="giocate">
           <th mat-header-cell *matHeaderCellDef>G</th>
           <td mat-cell *matCellDef="let s">{{ s.giocate }}</td>
         </ng-container>
-
         <ng-container matColumnDef="vittorie">
           <th mat-header-cell *matHeaderCellDef>V</th>
           <td mat-cell *matCellDef="let s">{{ s.vittorie }}</td>
         </ng-container>
-
         <ng-container matColumnDef="pf">
           <th mat-header-cell *matHeaderCellDef>PF</th>
           <td mat-cell *matCellDef="let s">{{ s.pf }}</td>
         </ng-container>
-
         <ng-container matColumnDef="ps">
           <th mat-header-cell *matHeaderCellDef>PS</th>
           <td mat-cell *matCellDef="let s">{{ s.ps }}</td>
         </ng-container>
-
         <ng-container matColumnDef="diff">
           <th mat-header-cell *matHeaderCellDef>Diff</th>
           <td mat-cell *matCellDef="let s">{{ s.diff }}</td>
         </ng-container>
-
         <ng-container matColumnDef="pt">
           <th mat-header-cell *matHeaderCellDef>Pt</th>
           <td mat-cell *matCellDef="let s"><strong>{{ s.pt }}</strong></td>
         </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumnsGenerale"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsGenerale; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumnsGenerale"></tr>
       </table>
     </div>
-    <ng-template #noStandings>
-      <p class="muted">— Classifica non disponibile —</p>
-    </ng-template>
+    <ng-template #noStandings><p class="muted">— Classifica non disponibile —</p></ng-template>
   </mat-card>
 </div>

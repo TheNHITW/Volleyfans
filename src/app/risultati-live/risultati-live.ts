@@ -7,6 +7,8 @@ interface Cell {
   cls?: string;
 }
 
+
+
 type RoundGroup = { round: number; matches: any[] };
 
 @Component({
@@ -23,6 +25,12 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
   displayedColumnsGenerale = ['rank','team', 'pt','girone','giocate','vittorie','pf','ps','diff'];
 
   constructor(private tournament: TournamentService) {}
+
+  displayedColumnsMatrix(sec: any): string[] {
+    const dyn = (sec?.teams ?? []).map((_: any, j: number) => 'c' + j);
+    return ['idx', 'team', ...dyn, 'vs', 'pf', 'diff'];
+    
+  }
 
   ngOnInit(): void {
     this.tournament.connectLive(this.selectedDate);
@@ -139,24 +147,70 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
     return out;
   }
 
-  /** Classifica generale (invariata) */
-  globalStandings(): Array<{ team: string; girone: string; giocate: number; vittorie: number; pf: number; ps: number; diff: number; pt: number; }> {
+
+  /** Classifica generale: mostra sempre tutte le squadre iscritte */
+  globalStandings(): Array<{
+    team: string; girone: string; giocate: number; vittorie: number;
+    pf: number; ps: number; diff: number; pt: number;
+  }> {
+    const groups = this.state?.tournament?.groups || {};
     const st = this.state?.tournament?.standings || {};
-    const out: any[] = [];
+    const allTeams: Array<{team: string, girone: string}> = [];
+
+    // 1) Raccogli tutte le squadre dai gironi
+    for (const g of Object.keys(groups).sort()) {
+      const teams: string[] = (groups[g] || [])
+        .map((t: any) => this.nameOf(t));
+      for (const team of teams) {
+        allTeams.push({ team, girone: g });
+      }
+    }
+
+    // 2) Semina tutte con stats = 0
+    const map = new Map<string, {
+      team: string; girone: string; giocate: number; vittorie: number;
+      pf: number; ps: number; diff: number; pt: number;
+    }>();
+
+    for (const t of allTeams) {
+      const key = `${t.girone}::${t.team}`;
+      map.set(key, {
+        team: t.team,
+        girone: t.girone,
+        giocate: 0,
+        vittorie: 0,
+        pf: 0,
+        ps: 0,
+        diff: 0,
+        pt: 0,
+      });
+    }
+
+    // 3) Applica overlay standings se ci sono
     for (const g of Object.keys(st)) {
       for (const row of st[g] || []) {
-        out.push({
-          team: row.teamName ?? row.team ?? '',
+        const team = row.teamName ?? row.team ?? '';
+        const key = `${g}::${team}`;
+        if (!team) continue;
+        const pf = Number(row.pf ?? 0);
+        const ps = Number(row.ps ?? row.pa ?? 0);
+        const vittorie = Number(row.vittorie ?? row.wins ?? 0);
+        const pt = Number(row.pt ?? row.points ?? (vittorie * 3));
+        map.set(key, {
+          team,
           girone: g,
-          giocate: row.giocate ?? 0,
-          vittorie: row.vittorie ?? row.wins ?? 0,
-          pf: row.pf ?? 0,
-          ps: row.ps ?? row.pa ?? 0,
-          diff: row.diff ?? ((row.pf ?? 0) - (row.ps ?? row.pa ?? 0)),
-          pt: row.pt ?? row.points ?? ((row.vittorie ?? row.wins ?? 0) * 3),
+          giocate: Number(row.giocate ?? 0),
+          vittorie,
+          pf,
+          ps,
+          diff: Number(row.diff ?? (pf - ps)),
+          pt,
         });
       }
     }
+
+    // 4) Array + ordinamento
+    const out = Array.from(map.values());
     out.sort((a, b) => {
       if (b.pt !== a.pt) return b.pt - a.pt;
       if (b.vittorie !== a.vittorie) return b.vittorie - a.vittorie;
@@ -166,4 +220,6 @@ export class RisultatiLiveComponent implements OnInit, OnDestroy {
     });
     return out;
   }
+
+
 }
