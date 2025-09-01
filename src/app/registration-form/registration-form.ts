@@ -19,7 +19,6 @@ export class RegistrationForm implements OnInit {
   registrationForm: FormGroup;
   registrationOpen = true;
   dateOptions = [
-  { value: '2025-08-31', label: 'Domenica 31 Agosto 2025' },
   { value: '2025-09-14', label: 'Domenica 14 Settembre 2025' },
   { value: '2025-10-05', label: 'Domenica 5 Ottobre 2025' }
 ];
