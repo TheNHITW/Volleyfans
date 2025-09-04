@@ -1,34 +1,43 @@
 <h1>Area Admin</h1>
 
-<!-- 🔘 Selezione della data -->
-<mat-form-field appearance="fill" class="full-width" style="max-width: 300px; margin-bottom: 1rem;">
-  <mat-label>Seleziona una data</mat-label>
-  <mat-select [(value)]="selectedDate" (selectionChange)="onDateChange()">
-    <mat-option *ngFor="let date of availableDates" [value]="date.value">
-      {{ date.label }}
-    </mat-option>
-  </mat-select>
+  <!-- 🔘 Selezione della data -->
+  <mat-form-field appearance="fill" class="full-width" style="max-width: 300px; margin-bottom: 1rem;">
+    <mat-label>Seleziona una data</mat-label>
+    <mat-select [(value)]="selectedDate" (selectionChange)="onDateChange()">
+      <mat-option *ngFor="let date of availableDates" [value]="date.value">
+        {{ date.label }}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 
-<!-- 🔘 Pulsanti principali -->
-<div class="admin-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-  <button mat-raised-button class="csv-btn" (click)="exportToCSV()">Esporta CSV</button>
+  <!-- 🔘 Select vista (NUOVO) -->
+  <mat-form-field appearance="fill" class="full-width" style="max-width: 240px; margin-bottom: 1rem; margin-left: 0.5rem;">
+    <mat-label>Vista</mat-label>
+    <mat-select [(value)]="viewMode" (selectionChange)="onModeChange()">
+      <mat-option value="teams">Squadre</mat-option>
+      <mat-option value="aperitivo">Aperitivo</mat-option>
+    </mat-select>
+  </mat-form-field>
 
-  <button mat-raised-button
-          [ngClass]="isRegistrationOpen ? 'btn-open' : 'btn-closed'"
-          (click)="toggleRegistration()">
-    {{ isRegistrationOpen ? 'Iscrizioni Aperte' : 'Iscrizioni Chiuse' }}
-  </button>
+  <!-- 🔘 Pulsanti principali -->
+  <div class="admin-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+    <button mat-raised-button class="csv-btn" (click)="exportToCSV()">Esporta CSV</button>
 
-  <button mat-raised-button class="gestionale-btn" routerLink="/admin/classifiche">Gestionale gara</button>
-</div>
+    <button mat-raised-button
+            [ngClass]="isRegistrationOpen ? 'btn-open' : 'btn-closed'"
+            (click)="toggleRegistration()">
+      {{ isRegistrationOpen ? 'Iscrizioni Aperte' : 'Iscrizioni Chiuse' }}
+    </button>
+
+    <button mat-raised-button class="gestionale-btn" routerLink="/admin/classifiche">Gestionale gara</button>
+  </div>
 
 <!-- 📋 Tabella squadre (Angular Material) -->
 <table
   mat-table
   [dataSource]="teams"
   class="mat-elevation-z1 admin-table"
-  *ngIf="teams?.length">
+  *ngIf="viewMode === 'teams' && teams?.length">
 
   <ng-container matColumnDef="index">
     <th mat-header-cell *matHeaderCellDef> # </th>
@@ -113,5 +122,54 @@
   <tr mat-row        *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 
-<p *ngIf="!teams?.length">Nessuna squadra iscritta per la data selezionata.</p>
+<p *ngIf="viewMode === 'teams' && !teams?.length">
+  Nessuna squadra iscritta per la data selezionata.
+</p>
+
+<!-- 📋 Tabella aperitivo -->
+<table
+  mat-table
+  [dataSource]="aperitivo"
+  class="mat-elevation-z1 admin-table"
+  *ngIf="viewMode === 'aperitivo' && aperitivo?.length">
+
+  <!-- # -->
+  <ng-container matColumnDef="index">
+    <th mat-header-cell *matHeaderCellDef> # </th>
+    <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="fullName">
+    <th mat-header-cell *matHeaderCellDef>Nome e Cognome</th>
+    <td mat-cell *matCellDef="let row">{{ row.fullName }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="phone">
+    <th mat-header-cell *matHeaderCellDef>Telefono</th>
+    <td mat-cell *matCellDef="let row">{{ row.phone || '—' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="peopleCount">
+    <th mat-header-cell *matHeaderCellDef>N. Persone</th>
+    <td mat-cell *matCellDef="let row">{{ row.peopleCount }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="teamName">
+    <th mat-header-cell *matHeaderCellDef> Squadra </th>
+    <td mat-cell *matCellDef="let row">{{ row.teamName || '—' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="source">
+    <th mat-header-cell *matHeaderCellDef> Provenienza </th>
+    <td mat-cell *matCellDef="let row">
+      {{ row.source === 'Squadra' ? 'Squadra ' + row.teamName : 'Singolo' }}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedAperColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedAperColumns;"></tr>
+</table>
+
+<p *ngIf="viewMode === 'aperitivo' && !aperitivo?.length">Nessun iscritto all'aperitivo per la data selezionata.</p>
+
 

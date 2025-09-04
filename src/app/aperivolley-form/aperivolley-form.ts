@@ -6,9 +6,19 @@ import { HttpClient } from '@angular/common/http';
   selector: 'app-aperivolley-form',
   templateUrl: './aperivolley-form.html',
   standalone: false,
-  styleUrls: ['./aperivolley-form.css']
+  styleUrls: ['./aperivolley-form.css'],
 })
+
 export class AperivolleyForm implements OnInit {
+  displayedAperColumns: string[] = [
+    'index', 'fullName', 'phone', 'peopleCount', 'hasTeam'
+  ];
+  
+  readonly availableDates = [
+  { label: 'Domenica 14 Settembre 2025', value: '2025-09-14' },
+  { label: 'Domenica 5 Ottobre 2025',     value: '2025-10-05' }
+];
+
   form: FormGroup;
   isSubmitted = false;
 
@@ -19,21 +29,40 @@ export class AperivolleyForm implements OnInit {
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({
       fullName: ['', Validators.required],
-      age: ['', [Validators.required, Validators.min(10), Validators.max(99)]],
-      gender: ['', Validators.required],
       phone: ['', [Validators.required, Validators.pattern('^[0-9]{7,15}$')]],
-      email: ['', [Validators.required, Validators.email]],
+      age: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[0-9]+$'), // solo cifre
+          Validators.min(0),              // 0 può venire anche da solo
+          Validators.max(20)              // opzionale: limite superiore ragionevole
+        ]
+      ],
       note: [''],
-      privacyConsent: [false, Validators.requiredTrue]
+      privacyConsent: [false, Validators.requiredTrue],
+      eventDate: ['', Validators.required],
     });
-  }
+  } 
 
   ngOnInit(): void {}
 
   onSubmit(): void {
     if (this.form.invalid) return;
 
-    this.http.post(`${this.baseUrl}/aperivolley`, this.form.value).subscribe({
+    // normalizza numero
+    const raw = this.form.value;
+    const peopleCount = parseInt(raw.age, 10);
+    const payload = {
+      fullName: raw.fullName?.trim(),
+      phone: (raw.phone ?? '').toString().trim(),
+      peopleCount: Number.isFinite(peopleCount) ? peopleCount : 1,
+      note: raw.note ?? '',
+      privacyConsent: !!raw.privacyConsent,
+      date: raw.eventDate
+    };
+
+    this.http.post(`${this.baseUrl}/aperivolley`, payload).subscribe({
       next: () => {
         this.isSubmitted = true;
         this.form.reset();

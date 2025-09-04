@@ -211,14 +211,105 @@ app.post('/admin/toggle-registration', (req, res) => {
 });
 
 // ================== APERIVOLLEY ================== //
+// helper
+function getAperitivoFilePathForDate(date) {
+  return path.join(__dirname, 'data', `aperivolley-${date}.json`);
+}
+
+function readJsonArraySafe(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    console.error('Errore lettura JSON:', e);
+    return [];
+  }
+}
+
+function writeJsonArrayPretty(filePath, arr) {
+  fs.writeFileSync(filePath, JSON.stringify(arr, null, 2), 'utf8');
+}
+
+// ✅ POST iscrizione aperitivo
 app.post('/aperivolley', (req, res) => {
-  const partecipante = req.body;
-  const filePath = path.join(ensureDir(), 'aperivolley.json');
-  const esistenti = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath)) : [];
-  esistenti.push(partecipante);
-  fs.writeFileSync(filePath, JSON.stringify(esistenti, null, 2));
-  res.json({ success: true });
+  try {
+    const b = req.body || {};
+    const date = (b.date || '').toString();
+
+    if (!date) {
+      return res.status(400).json({ success: false, message: 'Data mancante.' });
+    }
+
+    const fullName = (b.fullName || '').trim();
+    const phone = (b.phone || '').trim();
+    const peopleCount = Number.isFinite(+b.peopleCount) && +b.peopleCount > 0 ? +b.peopleCount : 1;
+    const note = (b.note || '').trim();
+    const privacyConsent = !!b.privacyConsent;
+
+    if (!fullName) return res.status(400).json({ success: false, message: 'Nome mancante.' });
+    if (!phone) return res.status(400).json({ success: false, message: 'Telefono mancante.' });
+    if (!privacyConsent) return res.status(400).json({ success: false, message: 'Privacy non accettata.' });
+
+    const filePath = getAperitivoFilePathForDate(date);
+    const registrations = readJsonArraySafe(filePath);
+
+    registrations.push({
+      date,
+      fullName,
+      phone,
+      peopleCount,
+      note,
+      privacyConsent,
+      createdAt: new Date().toISOString()
+    });
+
+    writeJsonArrayPretty(filePath, registrations);
+    return res.json({ success: true, message: 'Iscrizione aperitivo salvata.' });
+
+  } catch (err) {
+    console.error('POST /aperivolley error:', err);
+    return res.status(500).json({ success: false, message: 'Errore server.' });
+  }
 });
+
+// helper per i file aperitivo
+function getAperitivoFilePathForDate(date) {
+  return path.join(__dirname, 'data', `aperivolley-${date}.json`);
+}
+
+function readJsonArraySafe(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    console.error('Errore lettura JSON:', e);
+    return [];
+  }
+}
+
+// ✅ GET iscritti aperitivo per data
+app.get('/admin/aperitivo', (req, res) => {
+  try {
+    const date = (req.query.date || '').toString();
+    if (!date) {
+      return res.status(400).json({ error: 'Parametro date mancante.' });
+    }
+
+    const filePath = getAperitivoFilePathForDate(date);
+    if (!fs.existsSync(filePath)) {
+      return res.json([]); // nessun iscritto
+    }
+
+    const registrations = readJsonArraySafe(filePath);
+    return res.json(registrations);
+  } catch (err) {
+    console.error('GET /admin/aperitivo error:', err);
+    return res.status(500).json({ error: 'Errore server.' });
+  }
+});
+
 
 // ================== GESTIONE TORNEO ================== //
 app.post('/admin/:date/groups', (req, res) => {
@@ -271,14 +362,11 @@ app.post('/admin/:date/result', (req, res) => {
     puntiA: a,
     puntiB: b
   };
-
-  // Aggiorna standings
   data.standings = computeStandings(data);
   writeTournament(date, data);
 
   res.json({ success: true, match, standings: data.standings });
 });
-
 
 app.get('/admin/:date/tournament', (req, res) => {
   const { date } = req.params;
@@ -288,7 +376,6 @@ app.get('/admin/:date/tournament', (req, res) => {
 app.get('/admin/:date/standings', (req, res) => {
   const { date } = req.params;
   const data = readTournament(date);
-  // opzionale: ricalcolare sempre
   data.standings = computeStandings(data);
   writeTournament(date, data);
   res.json(data.standings || {});

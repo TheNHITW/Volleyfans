@@ -9,6 +9,15 @@
         <input matInput formControlName="fullName" required>
       </mat-form-field>
 
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Data evento</mat-label>
+      <mat-select formControlName="eventDate" required>
+        <mat-option *ngFor="let d of availableDates" [value]="d.value">
+          {{ d.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Con quante persone verrai all'aperitivo?</mat-label>
         <input matInput formControlName="age" type="number" required>
