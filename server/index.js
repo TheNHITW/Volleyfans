@@ -39,24 +39,125 @@ function writeTournament(date, data) {
 app.get('/ping', (req, res) => res.send('pong'));
 
 // ================== REGISTRAZIONI ================== //
-app.post('/register', (req, res) => {
-  const newTeam = req.body;
-  const dates = newTeam.selectedDates;
-
-  if (!Array.isArray(dates) || dates.length === 0) {
-    return res.status(400).json({ success: false, message: 'Nessuna data selezionata.' });
+// --- helper sicuri per JSON ---
+function readJsonArraySafe(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    console.error('[readJsonArraySafe] parse error for', filePath, e);
+    return [];
   }
+}
 
-  dates.forEach(date => {
-    const filePath = getFilePathForDate(date);
-    const registrations = fs.existsSync(filePath)
-      ? JSON.parse(fs.readFileSync(filePath, 'utf8'))
-      : [];
-    registrations.push(newTeam);
-    fs.writeFileSync(filePath, JSON.stringify(registrations, null, 2));
-  });
+function writeJsonArrayPretty(filePath, arr) {
+  fs.writeFileSync(filePath, JSON.stringify(arr, null, 2), 'utf8');
+}
 
-  res.json({ success: true, message: 'Iscrizione registrata.' });
+// --- route /register aggiornata ---
+app.post('/register', (req, res) => {
+  try {
+    const body = req.body || {};
+
+    // 1) date: supporta sia selectedDates[] sia date singola
+    const dates = Array.isArray(body.selectedDates)
+      ? body.selectedDates
+      : (body.date ? [body.date] : []);
+
+    if (!Array.isArray(dates) || dates.length === 0) {
+      return res.status(400).json({ success: false, message: 'Nessuna data selezionata.' });
+    }
+
+    // 2) normalizza campo livello
+    const skillLevel = body.skillLevel || body.livello || 'Non specificato';
+
+    // 3) validazioni base
+    const teamName = (body.teamName || '').trim();
+    const phone = (body.phone || '').trim();
+    const privacyConsent = !!body.privacyConsent;
+    const players = Array.isArray(body.players) ? body.players : [];
+
+    if (!teamName) {
+      return res.status(400).json({ success: false, message: 'teamName mancante.' });
+    }
+    if (players.length !== 4) {
+      return res.status(400).json({ success: false, message: 'Devono esserci esattamente 4 giocatori.' });
+    }
+
+    // normalizza giocatori (trim + struttura)
+    const normalizedPlayers = players.map(p => ({
+      name: (p?.name || '').trim(),
+      gender: (p?.gender || '').trim().toUpperCase()
+    }));
+
+    // validazioni sui giocatori
+    if (normalizedPlayers.some(p => !p.name || !p.gender)) {
+      return res.status(400).json({ success: false, message: 'Ogni giocatore deve avere nome e sesso.' });
+    }
+    const males = normalizedPlayers.filter(p => p.gender === 'M').length;
+    const females = normalizedPlayers.filter(p => p.gender === 'F').length;
+    if (males !== 2 || females !== 2) {
+      return res.status(400).json({ success: false, message: 'Devono esserci esattamente 2 maschi e 2 femmine.' });
+    }
+    // (facoltativo) impedisci nomi duplicati nella stessa squadra
+    const names = normalizedPlayers.map(p => p.name.toLowerCase());
+    if (new Set(names).size !== names.length) {
+      return res.status(400).json({ success: false, message: 'I nomi dei giocatori nella stessa squadra devono essere univoci.' });
+    }
+
+    // 4) salva una entry per ogni data (senza selectedDates nel record)
+    const nowIso = new Date().toISOString();
+    const savedDates = [];
+
+    for (const date of dates) {
+      const filePath = getFilePathForDate(date);
+      const registrations = readJsonArraySafe(filePath);
+
+      // (opzionale ma consigliato) blocca teamName duplicato nella stessa data
+      const duplicateTeam = registrations.some(r =>
+        (r.teamName || '').trim().toLowerCase() === teamName.toLowerCase()
+      );
+      if (duplicateTeam) {
+        return res.status(409).json({
+          success: false,
+          message: `La squadra "${teamName}" risulta già registrata per la data ${date}.`
+        });
+      }
+
+      // (facoltativo) blocca giocatori già registrati in altre squadre nella stessa data
+      const existingNames = registrations.flatMap(r =>
+        Array.isArray(r.players) ? r.players.map(p => (p.name || '').trim().toLowerCase()) : []
+      );
+      const conflicted = names.find(n => existingNames.includes(n));
+      if (conflicted) {
+        return res.status(409).json({
+          success: false,
+          message: `Il giocatore "${conflicted}" è già iscritto per la data ${date}.`
+        });
+      }
+
+      const entry = {
+        date,
+        teamName,
+        phone,
+        players: normalizedPlayers,
+        privacyConsent,
+        skillLevel,
+        createdAt: nowIso
+      };
+
+      registrations.push(entry);
+      writeJsonArrayPretty(filePath, registrations);
+      savedDates.push(date);
+    }
+
+    return res.json({ success: true, message: 'Iscrizione registrata.', savedDates });
+  } catch (err) {
+    console.error('POST /register error:', err);
+    return res.status(500).json({ success: false, message: 'Errore server.' });
+  }
 });
 
 app.get('/admin/registrations', (req, res) => {
@@ -1288,8 +1389,6 @@ function schedule_1G4_3G3(g4, groups3) {
 
 
 // Call assignReferees similar to above (omitted for brevity)...
-
-
 
 // ================== STANDINGS ================== //
 function computeStandings(data) {

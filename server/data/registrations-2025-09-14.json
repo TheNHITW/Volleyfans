@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "date": "2025-09-14",
+    "teamName": "Se me la dai te l'appoggio",
+    "phone": "3929403958",
+    "players": [
+      {
+        "name": "Davide De Dominicis",
+        "gender": "M"
+      },
+      {
+        "name": "Alessandro Cittadini",
+        "gender": "M"
+      },
+      {
+        "name": "Elisa vigorito",
+        "gender": "F"
+      },
+      {
+        "name": "Sofia Falanga",
+        "gender": "F"
+      }
+    ],
+    "privacyConsent": true,
+    "skillLevel": "agonistico",
+    "createdAt": "2025-09-04T09:16:27.811Z"
+  }
+]

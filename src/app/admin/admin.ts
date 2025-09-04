@@ -8,6 +8,7 @@ interface Player {
 interface Team {
   teamName: string;
   phone?: string;
+  skillLevel?: string;
   players?: Player[];
 }
 
@@ -24,7 +25,9 @@ export class Admin implements OnInit {
 
   // colonne per mat-table (match con gli ng-container dell'HTML)
   displayedColumns: string[] = [
-    'teamName', 'phone',
+    'index',
+    'teamName', 'skillLevel', 
+    'phone',
     'p1Name','p1Gender',
     'p2Name','p2Gender',
     'p3Name','p3Gender',
@@ -84,43 +87,63 @@ export class Admin implements OnInit {
     return team?.players?.[idx]?.[key] ?? '—';
   }
 
-exportToCSV() {
-  if (!this.teams?.length) {
-    alert('Nessuna iscrizione trovata per questa data.');
-    return;
+  exportToCSV() {
+    if (!this.teams?.length) {
+      alert('Nessuna iscrizione trovata per questa data.');
+      return;
+    }
+
+    // Escaping CSV per campi con virgole, doppi apici, CR/LF
+    const esc = (v: any): string => {
+      const s = (v ?? '').toString();
+      if (/[",\r\n]/.test(s)) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    };
+
+    const header = [
+      'Nome Squadra', 'Livello', 'Telefono',
+      'Giocatore 1', 'Sesso 1',
+      'Giocatore 2', 'Sesso 2',
+      'Giocatore 3', 'Sesso 3',
+      'Giocatore 4', 'Sesso 4'
+    ];
+
+    const lines = this.teams.map(team => {
+      const p = (team.players ?? []).slice(0, 4);
+      while (p.length < 4) p.push({ name: '—', gender: '—' });
+
+      // normalizza M/F in maiuscolo (se già "—" lo lascia com’è)
+      const g = (idx: number) => {
+        const raw = (p[idx]?.gender ?? '').toString().trim();
+        return raw === '—' ? '—' : raw.toUpperCase();
+      };
+
+      return [
+        esc(team.teamName ?? ''),
+        esc(team.skillLevel ?? ''),
+        esc(team.phone ?? ''),
+        esc(p[0]?.name ?? ''), esc(g(0)),
+        esc(p[1]?.name ?? ''), esc(g(1)),
+        esc(p[2]?.name ?? ''), esc(g(2)),
+        esc(p[3]?.name ?? ''), esc(g(3))
+      ].join(',');
+    });
+
+    // BOM per Excel + CRLF per compatibilità
+    const csv = '\uFEFF' + header.join(',') + '\r\n' + lines.join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `iscrizioni_${this.selectedDate}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
-
-  const header = [
-    'Nome Squadra','Telefono',
-    'Giocatore 1','Sesso 1',
-    'Giocatore 2','Sesso 2',
-    'Giocatore 3','Sesso 3',
-    'Giocatore 4','Sesso 4'
-  ].join(',') + '\r\n';
-
-  const rows = this.teams.map(team => {
-    const p = team.players ?? [];
-    return [
-      team.teamName ?? '',
-      team.phone ?? '',
-      p[0]?.name ?? '', p[0]?.gender ?? '',
-      p[1]?.name ?? '', p[1]?.gender ?? '',
-      p[2]?.name ?? '', p[2]?.gender ?? '',
-      p[3]?.name ?? '', p[3]?.gender ?? ''
-    ].join(',');
-  }).join('\r\n');
-
-  // BOM per compatibilità Excel
-  const csv = '\uFEFF' + header + rows;
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `iscrizioni_${this.selectedDate}.csv`;
-  link.click();
-}
-
-
 
   toggleRegistration() {
     this.http.post<{ isRegistrationOpen: boolean }>(`${this.baseUrl}/admin/toggle-registration`, {})
