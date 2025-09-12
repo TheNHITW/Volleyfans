@@ -46,7 +46,7 @@ export class Admin implements OnInit {
   // colonne tabella squadre
   displayedColumns: string[] = [
     'index',
-    'teamName', 'skillLevel',
+    'teamName', 'Livello',
     'phone',
     'p1Name','p1Gender',
     'p2Name','p2Gender',
