@@ -46,7 +46,7 @@ export class Admin implements OnInit {
   // colonne tabella squadre
   displayedColumns: string[] = [
     'index',
-    'teamName', 'Livello',
+    'teamName', 'skillLevel',
     'phone',
     'p1Name','p1Gender',
     'p2Name','p2Gender',
@@ -208,7 +208,7 @@ loadAperitivo(date: string) {
     };
 
     const header = [
-      'Nome Squadra', 'Livello', 'Telefono',
+      'Nome Squadra', 'skillLevel', 'Telefono',
       'Giocatore 1', 'Sesso 1',
       'Giocatore 2', 'Sesso 2',
       'Giocatore 3', 'Sesso 3',

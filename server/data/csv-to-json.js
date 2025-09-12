@@ -31,6 +31,7 @@ function clean(value) {
 const teams = lines.map(line => {
   const [
     teamName,
+    skillLevel,
     phone,
     p1, g1,
     p2, g2,
@@ -40,6 +41,7 @@ const teams = lines.map(line => {
 
   return {
     teamName: clean(teamName),
+    skillLevel: clean(skillLevel),
     phone: clean(phone),
     players: [
       { name: clean(p1), gender: clean(g1) },
