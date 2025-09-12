@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2025-09-14",
+    "fullName": "asfdasdasdasd",
+    "phone": "1234523123253",
+    "peopleCount": 1,
+    "note": "",
+    "privacyConsent": true,
+    "createdAt": "2025-09-04T12:15:45.435Z"
+  },
+  {
+    "date": "2025-09-14",
+    "fullName": "Davide De Dominicis",
+    "phone": "3315489512",
+    "peopleCount": 2,
+    "note": "",
+    "privacyConsent": true,
+    "createdAt": "2025-09-04T13:10:03.910Z"
+  }
+]
