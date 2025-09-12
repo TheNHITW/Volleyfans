@@ -1,28 +1,200 @@
 [
   {
-    "date": "2025-09-14",
     "teamName": "Se me la dai te l'appoggio",
-    "phone": "3929403958",
+    "phone": "agonistico",
     "players": [
       {
-        "name": "Davide De Dominicis",
-        "gender": "M"
+        "name": "3929403958",
+        "gender": "Davide De Dominicis"
       },
       {
-        "name": "Alessandro Cittadini",
-        "gender": "M"
+        "name": "M",
+        "gender": "Alessandro Cittadini"
       },
       {
-        "name": "Elisa vigorito",
-        "gender": "F"
+        "name": "M",
+        "gender": "Elisa vigorito"
       },
       {
-        "name": "Sofia Falanga",
-        "gender": "F"
+        "name": "F",
+        "gender": "Sofia Falanga"
       }
-    ],
-    "privacyConsent": true,
-    "skillLevel": "agonistico",
-    "createdAt": "2025-09-04T09:16:27.811Z"
+    ]
+  },
+  {
+    "teamName": "Damose na mano (famose un amaro)",
+    "phone": "agonistico",
+    "players": [
+      {
+        "name": "3922947668",
+        "gender": "Silvia di bartolomeo"
+      },
+      {
+        "name": "F",
+        "gender": "Valerio Giannini"
+      },
+      {
+        "name": "M",
+        "gender": "Christian filini"
+      },
+      {
+        "name": "M",
+        "gender": "Francesca Pellegrini"
+      }
+    ]
+  },
+  {
+    "teamName": "\"Sa sa prova",
+    "phone": "si sente?\"",
+    "players": [
+      {
+        "name": "avanzato",
+        "gender": "3466438198"
+      },
+      {
+        "name": "Silvia Nobili",
+        "gender": "F"
+      },
+      {
+        "name": "Tamara Todisco",
+        "gender": "F"
+      },
+      {
+        "name": "Edoardo Angelini",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "GLI SCOBELLACCI",
+    "phone": "principiante",
+    "players": [
+      {
+        "name": "3409745291",
+        "gender": "Valeria Scovacricchi"
+      },
+      {
+        "name": "F",
+        "gender": "Chiara Scovacricchi"
+      },
+      {
+        "name": "F",
+        "gender": "Simone Bellocchio"
+      },
+      {
+        "name": "M",
+        "gender": "Alessandro Bracci"
+      }
+    ]
+  },
+  {
+    "teamName": "RUTTI DE BOSCO",
+    "phone": "agonistico",
+    "players": [
+      {
+        "name": "3701331395",
+        "gender": "GIOVANNI FILIPPI"
+      },
+      {
+        "name": "M",
+        "gender": "LAMBERTO GOBBI"
+      },
+      {
+        "name": "M",
+        "gender": "EMANUELA CERULLO"
+      },
+      {
+        "name": "F",
+        "gender": "IOLANDA PEREZ"
+      }
+    ]
+  },
+  {
+    "teamName": "La squadra avversaria",
+    "phone": "principiante",
+    "players": [
+      {
+        "name": "3347855147",
+        "gender": "Erik Hrustic"
+      },
+      {
+        "name": "M",
+        "gender": "Costanza Stacchiotti"
+      },
+      {
+        "name": "F",
+        "gender": "Mattia Arcorace"
+      },
+      {
+        "name": "M",
+        "gender": "Giulia Zappacosta"
+      }
+    ]
+  },
+  {
+    "teamName": "Punta Suina",
+    "phone": "intermedio",
+    "players": [
+      {
+        "name": "3473964497",
+        "gender": "Enrico Casini"
+      },
+      {
+        "name": "M",
+        "gender": "Massimo Cecconelli"
+      },
+      {
+        "name": "M",
+        "gender": "Giulia Santocchini"
+      },
+      {
+        "name": "F",
+        "gender": "Camilla Esposito"
+      }
+    ]
+  },
+  {
+    "teamName": "Pipi e patati",
+    "phone": "intermedio",
+    "players": [
+      {
+        "name": "3397794895",
+        "gender": "Beatrice Dominijanni"
+      },
+      {
+        "name": "F",
+        "gender": "Paolo Petrucci"
+      },
+      {
+        "name": "M",
+        "gender": "Eugenio Cavarretta"
+      },
+      {
+        "name": "M",
+        "gender": "Beatrice Melis"
+      }
+    ]
+  },
+  {
+    "teamName": "Team Orsetti Abbracciatori",
+    "phone": "intermedio",
+    "players": [
+      {
+        "name": "3392194155",
+        "gender": "Federica Micheli"
+      },
+      {
+        "name": "F",
+        "gender": "Simone Brositti"
+      },
+      {
+        "name": "M",
+        "gender": "Giordano Fabri"
+      },
+      {
+        "name": "M",
+        "gender": "Giulia Serena Rolli"
+      }
+    ]
   }
 ]
