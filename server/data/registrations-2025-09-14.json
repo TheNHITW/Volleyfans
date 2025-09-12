@@ -1,7 +1,7 @@
 [
   {
     "teamName": "Se me la dai te l'appoggio",
-    "livello": "agonistico",
+    "skillLevel": "agonistico",
     "phone": "3929403958",
     "players": [
       {
@@ -24,7 +24,7 @@
   },
   {
     "teamName": "Damose na mano (famose un amaro)",
-    "livello": "agonistico",
+    "skillLevel": "agonistico",
     "phone": "3922947668",
     "players": [
       {
@@ -47,7 +47,7 @@
   },
   {
     "teamName": "Sa sa prova si sente?",
-    "livello": "avanzato",
+    "skillLevel": "avanzato",
     "phone": "3466438198",
     "players": [
       {
@@ -70,7 +70,7 @@
   },
   {
     "teamName": "GLI SCOBELLACCI",
-    "livello": "principiante",
+    "skillLevel": "principiante",
     "phone": "3409745291",
     "players": [
       {
@@ -93,7 +93,7 @@
   },
   {
     "teamName": "RUTTI DE BOSCO",
-    "livello": "agonistico",
+    "skillLevel": "agonistico",
     "phone": "3701331395",
     "players": [
       {
@@ -116,7 +116,7 @@
   },
   {
     "teamName": "La squadra avversaria",
-    "livello": "principiante",
+    "skillLevel": "principiante",
     "phone": "3347855147",
     "players": [
       {
@@ -139,7 +139,7 @@
   },
   {
     "teamName": "Punta Suina",
-    "livello": "intermedio",
+    "skillLevel": "intermedio",
     "phone": "3473964497",
     "players": [
       {
@@ -162,7 +162,7 @@
   },
   {
     "teamName": "Pipi e patati",
-    "livello": "intermedio",
+    "skillLevel": "intermedio",
     "phone": "3397794895",
     "players": [
       {
@@ -185,7 +185,7 @@
   },
   {
     "teamName": "Team Orsetti Abbracciatori",
-    "livello": "intermedio",
+    "skillLevel": "intermedio",
     "phone": "3392194155",
     "players": [
       {
@@ -208,7 +208,7 @@
   },
   {
     "teamName": "Se me la dai  te l’appoggio",
-    "livello": "agonistico",
+    "skillLevel": "agonistico",
     "phone": "3920333655",
     "players": [
       {
