@@ -1,199 +1,231 @@
 [
   {
     "teamName": "Se me la dai te l'appoggio",
-    "phone": "agonistico",
+    "livello": "agonistico",
+    "phone": "3929403958",
     "players": [
       {
-        "name": "3929403958",
-        "gender": "Davide De Dominicis"
+        "name": "Davide De Dominicis",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Alessandro Cittadini"
+        "name": "Alessandro Cittadini",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Elisa vigorito"
+        "name": "Elisa vigorito",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Sofia Falanga"
+        "name": "Sofia Falanga",
+        "gender": "F"
       }
     ]
   },
   {
     "teamName": "Damose na mano (famose un amaro)",
-    "phone": "agonistico",
+    "livello": "agonistico",
+    "phone": "3922947668",
     "players": [
       {
-        "name": "3922947668",
-        "gender": "Silvia di bartolomeo"
+        "name": "Silvia di bartolomeo",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Valerio Giannini"
+        "name": "Valerio Giannini",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Christian filini"
+        "name": "Christian filini",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Francesca Pellegrini"
+        "name": "Francesca Pellegrini",
+        "gender": "F"
       }
     ]
   },
   {
     "teamName": "Sa sa prova si sente?",
-    "phone": "avanzato",
+    "livello": "avanzato",
+    "phone": "3466438198",
     "players": [
       {
-        "name": "3466438198",
-        "gender": "Silvia Nobili"
+        "name": "Silvia Nobili",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Tamara Todisco"
+        "name": "Tamara Todisco",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Edoardo Angelini"
+        "name": "Edoardo Angelini",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Edoardo ??"
+        "name": "Edoardo ??",
+        "gender": "M"
       }
     ]
   },
   {
     "teamName": "GLI SCOBELLACCI",
-    "phone": "principiante",
+    "livello": "principiante",
+    "phone": "3409745291",
     "players": [
       {
-        "name": "3409745291",
-        "gender": "Valeria Scovacricchi"
+        "name": "Valeria Scovacricchi",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Chiara Scovacricchi"
+        "name": "Chiara Scovacricchi",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Simone Bellocchio"
+        "name": "Simone Bellocchio",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Alessandro Bracci"
+        "name": "Alessandro Bracci",
+        "gender": "M"
       }
     ]
   },
   {
     "teamName": "RUTTI DE BOSCO",
-    "phone": "agonistico",
+    "livello": "agonistico",
+    "phone": "3701331395",
     "players": [
       {
-        "name": "3701331395",
-        "gender": "GIOVANNI FILIPPI"
+        "name": "GIOVANNI FILIPPI",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "LAMBERTO GOBBI"
+        "name": "LAMBERTO GOBBI",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "EMANUELA CERULLO"
+        "name": "EMANUELA CERULLO",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "IOLANDA PEREZ"
+        "name": "IOLANDA PEREZ",
+        "gender": "F"
       }
     ]
   },
   {
     "teamName": "La squadra avversaria",
-    "phone": "principiante",
+    "livello": "principiante",
+    "phone": "3347855147",
     "players": [
       {
-        "name": "3347855147",
-        "gender": "Erik Hrustic"
+        "name": "Erik Hrustic",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Costanza Stacchiotti"
+        "name": "Costanza Stacchiotti",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Mattia Arcorace"
+        "name": "Mattia Arcorace",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Giulia Zappacosta"
+        "name": "Giulia Zappacosta",
+        "gender": "F"
       }
     ]
   },
   {
     "teamName": "Punta Suina",
-    "phone": "intermedio",
+    "livello": "intermedio",
+    "phone": "3473964497",
     "players": [
       {
-        "name": "3473964497",
-        "gender": "Enrico Casini"
+        "name": "Enrico Casini",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Massimo Cecconelli"
+        "name": "Massimo Cecconelli",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Giulia Santocchini"
+        "name": "Giulia Santocchini",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Camilla Esposito"
+        "name": "Camilla Esposito",
+        "gender": "F"
       }
     ]
   },
   {
     "teamName": "Pipi e patati",
-    "phone": "intermedio",
+    "livello": "intermedio",
+    "phone": "3397794895",
     "players": [
       {
-        "name": "3397794895",
-        "gender": "Beatrice Dominijanni"
+        "name": "Beatrice Dominijanni",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Paolo Petrucci"
+        "name": "Paolo Petrucci",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Eugenio Cavarretta"
+        "name": "Eugenio Cavarretta",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Beatrice Melis"
+        "name": "Beatrice Melis",
+        "gender": "F"
       }
     ]
   },
   {
     "teamName": "Team Orsetti Abbracciatori",
-    "phone": "intermedio",
+    "livello": "intermedio",
+    "phone": "3392194155",
     "players": [
       {
-        "name": "3392194155",
-        "gender": "Federica Micheli"
+        "name": "Federica Micheli",
+        "gender": "F"
       },
       {
-        "name": "F",
-        "gender": "Simone Brositti"
+        "name": "Simone Brositti",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Giordano Fabri"
+        "name": "Giordano Fabri",
+        "gender": "M"
       },
       {
-        "name": "M",
-        "gender": "Giulia Serena Rolli"
+        "name": "Giulia Serena Rolli",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Se me la dai  te l’appoggio",
+    "livello": "agonistico",
+    "phone": "3920333655",
+    "players": [
+      {
+        "name": "Daniele de dominicis",
+        "gender": "M"
+      },
+      {
+        "name": "Emanuele martucci",
+        "gender": "M"
+      },
+      {
+        "name": "Francesca dulisse",
+        "gender": "F"
+      },
+      {
+        "name": "Alessia D’Alessandro",
+        "gender": "F"
       }
     ]
   }
