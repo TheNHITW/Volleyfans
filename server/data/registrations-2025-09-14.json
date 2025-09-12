@@ -44,24 +44,24 @@
     ]
   },
   {
-    "teamName": "\"Sa sa prova",
-    "phone": "si sente?\"",
+    "teamName": "Sa sa prova si sente?",
+    "phone": "avanzato",
     "players": [
       {
-        "name": "avanzato",
-        "gender": "3466438198"
+        "name": "3466438198",
+        "gender": "Silvia Nobili"
       },
       {
-        "name": "Silvia Nobili",
-        "gender": "F"
+        "name": "F",
+        "gender": "Tamara Todisco"
       },
       {
-        "name": "Tamara Todisco",
-        "gender": "F"
+        "name": "F",
+        "gender": "Edoardo Angelini"
       },
       {
-        "name": "Edoardo Angelini",
-        "gender": "M"
+        "name": "M",
+        "gender": "Edoardo ??"
       }
     ]
   },
