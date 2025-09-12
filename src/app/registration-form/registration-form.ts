@@ -78,7 +78,6 @@ export class RegistrationForm implements OnInit {
       alert('Devi inserire esattamente 4 giocatori.');
       return;
     }
-
     if (players.some(p => !p.name.trim() || !p.gender)) {
       alert('Tutti i giocatori devono avere nome e sesso.');
       return;
@@ -98,7 +97,7 @@ export class RegistrationForm implements OnInit {
       return;
     }
 
-    const allDates = formData.selectedDates;
+    const allDates: string[] = formData.selectedDates;
     let allRegistrations: any[] = [];
 
     Promise.all(
@@ -108,14 +107,14 @@ export class RegistrationForm implements OnInit {
     ).then((results) => {
       allRegistrations = results.flat();
 
-      const teamNameTaken = allRegistrations.some(t => t.teamName.trim().toLowerCase() === teamName);
+      const teamNameTaken = allRegistrations.some(t => (t.teamName || '').trim().toLowerCase() === teamName);
       if (teamNameTaken) {
         alert('Nome squadra già iscritto.');
         return;
       }
 
       const allRegisteredNames = allRegistrations.flatMap(t =>
-        t.players.map((p: Player) => p.name.trim().toLowerCase())
+        (t.players || []).map((p: Player) => (p.name || '').trim().toLowerCase())
       );
       const duplicated = names.find(name => allRegisteredNames.includes(name));
       if (duplicated) {
@@ -123,17 +122,28 @@ export class RegistrationForm implements OnInit {
         return;
       }
 
-      this.http.post(`${this.baseUrl}/register`, formData)
-        .subscribe({
-          next: () => {
-            alert('Iscrizione inviata! Squadra registrata.');
-            this.registrationForm.reset();
-          },
-          error: (err) => {
-            console.error('Errore iscrizione:', err);
-            alert('Si è verificato un errore. Riprova.');
-          }
-        });
+      // ✅ Normalizza: lasciamo "livello" nel form, ma inviamo "skillLevel" nel payload
+      const payloadBase = {
+        teamName: formData.teamName,
+        phone: formData.phone,
+        players: formData.players,
+        privacyConsent: formData.privacyConsent,
+        skillLevel: formData.skillLevel || 'Non specificato', // <-- già giusto
+      };
+
+      // Supportiamo più date: il backend salverà una entry per ciascuna data
+      const payload = { ...payloadBase, selectedDates: allDates };
+
+      this.http.post(`${this.baseUrl}/register`, payload).subscribe({
+        next: () => {
+          alert('Iscrizione inviata! Squadra registrata.');
+          this.registrationForm.reset();
+        },
+        error: (err) => {
+          console.error('Errore iscrizione:', err);
+          alert('Si è verificato un errore. Riprova.');
+        }
+      });
     }).catch((err) => {
       console.error('Errore durante la verifica delle iscrizioni:', err);
       alert('Errore durante la verifica. Riprova più tardi.');
