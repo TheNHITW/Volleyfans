@@ -19,7 +19,6 @@ export class RegistrationForm implements OnInit {
   registrationForm: FormGroup;
   registrationOpen = true;
   dateOptions = [
-  { value: '2025-09-14', label: 'Domenica 14 Settembre 2025' },
   { value: '2025-10-05', label: 'Domenica 5 Ottobre 2025' }
 ];
 
@@ -128,7 +127,7 @@ export class RegistrationForm implements OnInit {
         phone: formData.phone,
         players: formData.players,
         privacyConsent: formData.privacyConsent,
-        skillLevel: formData.skillLevel || 'Non specificato', // <-- già giusto
+        skillLevel: formData.livello || 'Non specificato', // <-- già giusto
       };
 
       // Supportiamo più date: il backend salverà una entry per ciascuna data

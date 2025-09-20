@@ -77,7 +77,7 @@ export class Admin implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.selectedDate = this.availableDates[1].value;
+    this.selectedDate = this.availableDates[2].value;
     this.loadTeams(this.selectedDate);
     this.getRegistrationStatus();
   }
