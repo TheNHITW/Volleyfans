@@ -1,1 +1,278 @@
-[]
+[
+  {
+    "teamName": "Se me la dai te l'appoggio",
+    "skillLevel": "avanzato",
+    "phone": "3929403958",
+    "players": [
+      {
+        "name": "Davide de Dominicis",
+        "gender": "M"
+      },
+      {
+        "name": "Daniele de Dominicis",
+        "gender": "M"
+      },
+      {
+        "name": "Elisa Vigorito",
+        "gender": "F"
+      },
+      {
+        "name": "Francesca",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "i bossoli",
+    "skillLevel": "intermedio",
+    "phone": "3283850780",
+    "players": [
+      {
+        "name": "Verena cirilli",
+        "gender": "F"
+      },
+      {
+        "name": "luca trappolini",
+        "gender": "M"
+      },
+      {
+        "name": "Francesco trappolini",
+        "gender": "M"
+      },
+      {
+        "name": "alessia pacifici",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Mettete reggaeton",
+    "skillLevel": "intermedio",
+    "phone": "3920794907",
+    "players": [
+      {
+        "name": "Sofia Falanga",
+        "gender": "F"
+      },
+      {
+        "name": "Alessandro Cittadini",
+        "gender": "M"
+      },
+      {
+        "name": "Federico Cestola",
+        "gender": "M"
+      },
+      {
+        "name": "Maria Rossi?",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Stupiscici!",
+    "skillLevel": "principiante",
+    "phone": "3347855147",
+    "players": [
+      {
+        "name": "Erik Hrustic",
+        "gender": "M"
+      },
+      {
+        "name": "Marco Resitano",
+        "gender": "M"
+      },
+      {
+        "name": "Giulia Zappacosta",
+        "gender": "F"
+      },
+      {
+        "name": "Denise Angelini",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Piccoli Incubi",
+    "skillLevel": "principiante",
+    "phone": "3401490732",
+    "players": [
+      {
+        "name": "Laura Cerruti",
+        "gender": "F"
+      },
+      {
+        "name": "Federica Sassù",
+        "gender": "F"
+      },
+      {
+        "name": "Damiano Frusteri",
+        "gender": "M"
+      },
+      {
+        "name": "Luca Orso",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "Quelli che la danno (la palla)",
+    "skillLevel": "avanzato",
+    "phone": "3917732866",
+    "players": [
+      {
+        "name": "Kristel Tardani",
+        "gender": "F"
+      },
+      {
+        "name": "Carola Danesi",
+        "gender": "F"
+      },
+      {
+        "name": "Alessandro Cerulli",
+        "gender": "M"
+      },
+      {
+        "name": "Edoardo Angelini",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "Bagheristi anonimi",
+    "skillLevel": "principiante",
+    "phone": "3293360122",
+    "players": [
+      {
+        "name": "Antonino Tarantino",
+        "gender": "M"
+      },
+      {
+        "name": "Paolo Scarfò",
+        "gender": "M"
+      },
+      {
+        "name": "Cristina Nigriello",
+        "gender": "F"
+      },
+      {
+        "name": "Silvia Nobili",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Squick team",
+    "skillLevel": "avanzato",
+    "phone": "3294435280",
+    "players": [
+      {
+        "name": "Tamara Todisco",
+        "gender": "F"
+      },
+      {
+        "name": "Antonio Piscitelli",
+        "gender": "M"
+      },
+      {
+        "name": "Cecilia Piscitelli",
+        "gender": "F"
+      },
+      {
+        "name": "Roberto Durante",
+        "gender": "M"
+      }
+    ]
+  },
+  {
+    "teamName": "37 smalto bianco",
+    "skillLevel": "principiante",
+    "phone": "3458096905",
+    "players": [
+      {
+        "name": "Davide",
+        "gender": "M"
+      },
+      {
+        "name": "Danilo",
+        "gender": "M"
+      },
+      {
+        "name": "Asia",
+        "gender": "F"
+      },
+      {
+        "name": "Sara",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Azzuteam",
+    "skillLevel": "intermedio",
+    "phone": "3497063538",
+    "players": [
+      {
+        "name": "Azzurra Funari",
+        "gender": "F"
+      },
+      {
+        "name": "Federico Lucarelli",
+        "gender": "M"
+      },
+      {
+        "name": "Simone Lucarelli",
+        "gender": "M"
+      },
+      {
+        "name": "Gaia",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Testa cuore palle",
+    "skillLevel": "agonistico",
+    "phone": "3346312334",
+    "players": [
+      {
+        "name": "Mirko Cominardi",
+        "gender": "M"
+      },
+      {
+        "name": "Giovanni Ciavardini",
+        "gender": "M"
+      },
+      {
+        "name": "Lucia Felici",
+        "gender": "F"
+      },
+      {
+        "name": "Ilaria Scorsini",
+        "gender": "F"
+      }
+    ]
+  },
+  {
+    "teamName": "Gli smollicati di tetrapak",
+    "skillLevel": "avanzato",
+    "phone": "3701331395",
+    "players": [
+      {
+        "name": "Giovanni Filippi",
+        "gender": "M"
+      },
+      {
+        "name": "Dennis Di Falco",
+        "gender": "M"
+      },
+      {
+        "name": "Aurora Del Seno",
+        "gender": "F"
+      },
+      {
+        "name": "Noemi Visini",
+        "gender": "F"
+      }
+    ]
+  }
+]
