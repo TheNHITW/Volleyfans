@@ -50,7 +50,7 @@ export class AdminClassificheComponent implements OnInit {
   filteredTeams: Team[] = [];
   matchList: Match[] = [];
 
-  availableDates: string[] = ['2025-08-31', '2025-09-12', '2025-10-05'];
+  availableDates: string[] = ['2025-08-31', '2025-09-14', '2025-10-05'];
   selectedDate: string = this.availableDates[0];
 
   strutturaGironiSuggerita: { [key: string]: number } = {};

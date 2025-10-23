@@ -19,7 +19,7 @@ export class RegistrationForm implements OnInit {
   registrationForm: FormGroup;
   registrationOpen = true;
   dateOptions = [
-  { value: '2025-10-05', label: 'Domenica 5 Ottobre 2025' }
+  { value: '2025-10-05', label: 'Domenica 16 Novembre 2025' }
 ];
 
   constructor(private fb: FormBuilder, private http: HttpClient) {

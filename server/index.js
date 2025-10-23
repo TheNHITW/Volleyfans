@@ -500,7 +500,7 @@ function generateMatchesForAllGroups(groups) {
   // --- NORMALIZZA nomi (gestisce sia string che {teamName}) ---
   const nameOf = (t) => (typeof t === 'string' ? t : (t && t.teamName) ? t.teamName : String(t));
   const groupKeys = Object.keys(groups || {}).sort();
-  const LATE = { group: 'A', team: 'Se me la dai te l’appoggio', startRound: 4 }; // oppure null
+  const LATE = { group: 'A', team: 'Se me la dai te l’appoggio', startRound: null }; // oppure null
 
   // Mappa "pura" solo con NOME squadra
   const pure = {};
@@ -536,7 +536,87 @@ function generateMatchesForAllGroups(groups) {
   const g4Keys = groupKeys.filter(k => (pure[k] || []).length === 4);
   const g3Keys = groupKeys.filter(k => (pure[k] || []).length === 3);
 
-  // === SCENARIO 1 già presente: 1×G4 + 3×G3 (il tuo) ===
+    // === SCENARIO 12-A: 3×G4 (12 squadre) — 5 round, arbitri interni
+  if (g4Keys.length === 3 && g3Keys.length === 0 && FIELDS_PER_ROUND === 4) {
+    const [gA, gB, gC] = g4Keys;
+    const G4A = pure[gA].slice(), G4B = pure[gB].slice(), G4C = pure[gC].slice();
+
+    const A = berger4(G4A); // 3 blocchi x 2 match
+    const B = berger4(G4B);
+    const C = berger4(G4C);
+
+    // Piano round (5):
+    // R1: A blk1 (1-2) + B blk1 (3-4)
+    // R2: A blk2 (1-2) + C blk1 (3-4)
+    // R3: B blk2 (1-2) + C blk2 (3-4)
+    // R4: A blk3 (1-2) + B blk3 (3-4)
+    // R5: C blk3 (1-2)
+    const plan = [
+      { gA: A[0], gB: B[0], gC: null },
+      { gA: A[1], gB: null, gC: C[0] },
+      { gA: null, gB: B[1], gC: C[1] },
+      { gA: A[2], gB: B[2], gC: null },
+      { gA: null, gB: null, gC: C[2] },
+    ];
+
+    // util per assegnare arbitro interno “equo”
+    function scheduleBlock(gKey, teams, block, fieldStart, round, refCountMap, lastRefMap) {
+      if (!block) return [];
+      const out = [];
+      for (let i = 0; i < 2; i++) {
+        const pair = block[i]; // [a,b]
+        const idle = teams.filter(x => x !== pair[0] && x !== pair[1]);
+        // pick referee interno bilanciato (2–1–2–1 per T[0..3])
+        const target = new Map(teams.map((t, idx) => [t, (idx % 2 === 0) ? 2 : 1]));
+        if (!refCountMap[gKey]) refCountMap[gKey] = new Map(teams.map(t => [t, 0]));
+        const rc = refCountMap[gKey];
+        const last = lastRefMap[gKey] || null;
+
+        const cand = idle.slice().sort((a,b) => {
+          const needA = (rc.get(a)||0) - (target.get(a)||0);
+          const needB = (rc.get(b)||0) - (target.get(b)||0);
+          if (needA !== needB) return needA - needB;
+          const ra = rc.get(a)||0, rb = rc.get(b)||0;
+          if (ra !== rb) return ra - rb;
+          if (last && (a===last)!==(b===last)) return (a===last)?1:-1;
+          return teams.indexOf(a) - teams.indexOf(b);
+        });
+        const ref = cand[0];
+        rc.set(ref, (rc.get(ref)||0)+1);
+        lastRefMap[gKey] = ref;
+
+        out.push({
+          id: idFor(gKey, pair[0], pair[1]),
+          girone: gKey,
+          teamA: pair[0],
+          teamB: pair[1],
+          referee: ref,
+          field: fieldStart + i,
+          round
+        });
+      }
+      return out;
+    }
+
+    const refCountMap = {};
+    const lastRefMap  = {};
+    const scheduled = [];
+
+    for (let r = 1; r <= 5; r++) {
+      const row = plan[r-1];
+      // A sui campi 1-2 se presente, B sui 3-4, C sui 1-2 (quando B non c'è)
+      if (row.gA) scheduled.push(...scheduleBlock(gA, G4A, row.gA, 1, r, refCountMap, lastRefMap));
+      if (row.gB) scheduled.push(...scheduleBlock(gB, G4B, row.gB, 3, r, refCountMap, lastRefMap));
+      if (row.gC) {
+        const start = row.gA ? 3 : 1; // se A occupa 1-2, C va su 3-4, altrimenti su 1-2
+        scheduled.push(...scheduleBlock(gC, G4C, row.gC, start, r, refCountMap, lastRefMap));
+      }
+    }
+
+    return scheduled;
+  }
+
+  // === SCENARIO 1 : 1×G4 + 3×G3 ===
   if (g4Keys.length === 1 && g3Keys.length === 3 && FIELDS_PER_ROUND === 4) {
     const g4Key = g4Keys[0];
     const G4  = pure[g4Key].slice();
@@ -583,7 +663,7 @@ function generateMatchesForAllGroups(groups) {
     return scheduled;
   }
 
-  // === NUOVO SCENARIO 2: 2×G4 + 2×G3 ===
+  // === NUOVO SCENARIO 2: 2×G4 + 2×G3 (14 squadre) ===
   if (g4Keys.length === 2 && g3Keys.length === 2 && FIELDS_PER_ROUND === 4) {
     const [g4AKey, g4BKey] = g4Keys;
     const [g3AKey, g3BKey] = g3Keys;
@@ -731,10 +811,11 @@ function generateMatchesForAllGroups(groups) {
     // late in G3 (startRound>=4): R3 (presenti vs presenti), R4 e R6 (late vs present)
     const g3ByRound = Array(6).fill(null); // 1..6
     function placeG3Default() {
-      g3ByRound[1] = { a: D[0][0], b: D[0][1] }; // R2
-      g3ByRound[3] = { a: D[1][0], b: D[1][1] }; // R4
-      g3ByRound[5] = { a: D[2][0], b: D[2][1] }; // R6
+      g3ByRound[0] = { a: D[0][0], b: D[0][1] }; // R1
+      g3ByRound[2] = { a: D[1][0], b: D[1][1] }; // R3
+      g3ByRound[4] = { a: D[2][0], b: D[2][1] }; // R5
     }
+
     function placeG3WithLate(teamName, startRound) {
       const tLate = teamName;
       const all = [
@@ -745,10 +826,10 @@ function generateMatchesForAllGroups(groups) {
       const involvesLate = (m) => m.a === tLate || m.b === tLate;
       const early = all.find(m => !involvesLate(m));
       const lateMs = all.filter(involvesLate);
-      // R3: presenti vs presenti (early), R4 e R6: match con late
-      g3ByRound[2] = early || null;       // R3
-      g3ByRound[3] = lateMs[0] || null;   // R4
-      g3ByRound[5] = lateMs[1] || null;   // R6
+      // Con late (da R4): R3 = presenti vs presenti, poi late a R4 e R6
+      g3ByRound[2] = early || null;     // R3
+      g3ByRound[3] = lateMs[0] || null; // R4
+      g3ByRound[5] = lateMs[1] || null; // R6
     }
 
     if (late && late.group === g3Key && G3D.includes(late.team) && (Number(late.startRound) || 4) >= 4) {
