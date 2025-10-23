@@ -72,7 +72,7 @@ export class Admin implements OnInit {
     { label: '31 Agosto 2025', value: '2025-08-31' },
     { label: '14 Settembre 2025', value: '2025-09-14' },
     { label: '5 Ottobre 2025', value: '2025-10-05' },
-    { label: '16 Novembre 2025', value: '2025-10-05' }
+    { label: '16 Novembre 2025', value: '2025-11-16' }
   ];
 
   constructor(private http: HttpClient) {}
